@@ -5,7 +5,7 @@
       role="group1"
       default="false"
       check-well-formed="false"
-      check-xsd-grammer="true"
+      check-xsd-grammar="true"
       check-elements="true"
       use-saxon="false">
 
@@ -93,6 +93,5 @@
       check-xsd-grammar="true"
       check-elements="true"
       check-headers="true"
-      use-saxon="false"
-      enable-ignore-xsd-extension="true"  />
+      use-saxon="false" />
 </validators>
