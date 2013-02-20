@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.rackspace.papi</groupId>
         <artifactId>profile-support</artifactId>
-        <version>2.5.1-SNAPSHOT</version>
+        <version>2.6.3-SNAPSHOT</version>
     </parent>
 
     <groupId>com.rackspace.papi.components</groupId>
     <artifactId>components-support</artifactId>
-
+ 
     <name>Repose Components - Components Support</name>
     <packaging>pom</packaging>
 
@@ -123,7 +123,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.4</version>
+                <version>1.7</version>
             </dependency>
 
             <dependency>

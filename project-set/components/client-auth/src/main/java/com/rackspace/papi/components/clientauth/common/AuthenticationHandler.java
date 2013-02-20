@@ -42,7 +42,7 @@ public abstract class AuthenticationHandler extends AbstractFilterLogicHandler {
    private final AuthTokenCache cache;
    private final AuthGroupCache grpCache;
    private final UriMatcher uriMatcher;
-   private final boolean includeQueryParams, tenanted;
+   private final boolean tenanted;
    private final long groupCacheTtl;
    private final long userCacheTtl;
 
@@ -52,7 +52,6 @@ public abstract class AuthenticationHandler extends AbstractFilterLogicHandler {
       this.cache = cache;
       this.grpCache = grpCache;
       this.uriMatcher = uriMatcher;
-      this.includeQueryParams = configurables.isIncludeQueryParams();
       this.tenanted = configurables.isTenanted();
       this.groupCacheTtl = configurables.getGroupCacheTtl();
       this.userCacheTtl = configurables.getUserCacheTtl();
@@ -108,9 +107,13 @@ public abstract class AuthenticationHandler extends AbstractFilterLogicHandler {
                LOG.error("Failure communicating with the auth service: " + ex.getMessage(), ex);
                filterDirector.setResponseStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
             } catch (AuthServiceException ex) {
-               LOG.error("Failure in auth: " + ex.getMessage());
+               LOG.error("Failure in Auth-N: " + ex.getMessage());
                filterDirector.setResponseStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
-            } catch (Exception ex) {
+            }catch (IllegalArgumentException ex){
+               LOG.error("Failure in Auth-N: " + ex.getMessage());
+               filterDirector.setResponseStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
+            } 
+            catch (Exception ex) {
                LOG.error("Failure in auth: " + ex.getMessage(), ex);
                filterDirector.setResponseStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
             }
@@ -152,10 +155,6 @@ public abstract class AuthenticationHandler extends AbstractFilterLogicHandler {
 
    private ExtractorResult<String> extractAccountIdentification(HttpServletRequest request) {
       StringBuilder accountString = new StringBuilder(request.getRequestURI());
-      if (includeQueryParams && request.getQueryString() != null) {
-         accountString.append("?").append(request.getQueryString());
-
-      }
 
       return keyedRegexExtractor.extract(accountString.toString());
    }

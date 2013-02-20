@@ -1,6 +1,5 @@
 package com.rackspace.papi.components.translation;
 
-import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.io.BufferedServletInputStream;
 import com.rackspace.papi.commons.util.io.RawInputStreamReader;
 import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletRequest;
@@ -13,7 +12,6 @@ import com.rackspace.papi.components.translation.config.ResponseTranslations;
 import com.rackspace.papi.components.translation.config.StyleSheet;
 import com.rackspace.papi.components.translation.config.StyleSheets;
 import com.rackspace.papi.components.translation.config.TranslationConfig;
-import com.rackspace.papi.components.translation.xslt.xmlfilterchain.XmlFilterChainBuilder;
 import com.rackspace.papi.filter.logic.FilterAction;
 import com.rackspace.papi.filter.logic.FilterDirector;
 import com.rackspace.papi.service.config.ConfigurationService;
@@ -21,15 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXTransformerFactory;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +48,7 @@ public class TranslationHandlerTest {
         @Before
         public void setup() {
             manager = mock(ConfigurationService.class);
-            factory = new TranslationHandlerFactory(manager, new XmlFilterChainBuilder((SAXTransformerFactory) TransformerFactory.newInstance()), "", "");
+            factory = new TranslationHandlerFactory(manager, "", "");
             TranslationConfig config = new TranslationConfig();
 
             RequestTranslations requestTranslations = new RequestTranslations();
@@ -88,10 +82,7 @@ public class TranslationHandlerTest {
             
             config.setRequestTranslations(requestTranslations);
             config.setResponseTranslations(responseTranslations);
-            Map<Class, UpdateListener<?>> listeners = factory.getListeners();
-            Iterator<Map.Entry<Class, UpdateListener<?>>> iterator = listeners.entrySet().iterator();
-            UpdateListener<TranslationConfig> listener = (UpdateListener<TranslationConfig>) iterator.next().getValue();
-            listener.configurationUpdated(config);
+            factory.configurationUpdated(config);
             handler = factory.buildHandler();
 
             mockedRequest = mock(HttpServletRequest.class);
@@ -117,13 +108,15 @@ public class TranslationHandlerTest {
             InputStream response = this.getClass().getResourceAsStream("/empty.xml");
             when(mockedRequest.getAttribute(eq("repose.response.input.stream"))).thenReturn(response);
             when(mockedResponse.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
 
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleResponse(mutableHttpRequest, mutableHttpResponse);
             String actual = director.getResponseMessageBody();
-            final String expected = "<add-me>\n   <root/>\n</add-me>\n";
+            final String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><add-me xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><root/></add-me>";
 
             Diff diff1 = new Diff(expected, actual);
 
@@ -137,13 +130,15 @@ public class TranslationHandlerTest {
             InputStream response = this.getClass().getResourceAsStream("/remove-me-element.xml");
             when(mockedRequest.getAttribute(eq("repose.response.input.stream"))).thenReturn(response);
             when(mockedResponse.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleResponse(mutableHttpRequest, mutableHttpResponse);
             String actual = director.getResponseMessageBody();
-            final String expected = "<add-me>\n   <root>\n    This is  a test.\n</root>\n</add-me>";
-
+            final String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><add-me xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><root>\n    This is  a test.\n</root></add-me>";
+            
             Diff diff1 = new Diff(expected, actual);
 
             assertEquals(director.getFilterAction(), FilterAction.PASS);
@@ -155,8 +150,10 @@ public class TranslationHandlerTest {
 
             when(mockedRequest.getAttribute(eq("repose.response.input.stream"))).thenReturn(null);
             when(mockedResponse.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleResponse(mutableHttpRequest, mutableHttpResponse);
             String actual = director.getResponseMessageBody();
@@ -174,8 +171,10 @@ public class TranslationHandlerTest {
             when(mockedRequest.getHeaders(eq("accept"))).thenReturn((Enumeration) new StringTokenizer("application/json"));
             when(mockedRequest.getContentType()).thenReturn("application/xml");
             when(mockedResponse.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleResponse(mutableHttpRequest, mutableHttpResponse);
             String actual = new String(RawInputStreamReader.instance().readFully(mutableHttpResponse.getInputStream()));
@@ -202,7 +201,7 @@ public class TranslationHandlerTest {
         @Before
         public void setup() {
             manager = mock(ConfigurationService.class);
-            factory = new TranslationHandlerFactory(manager, new XmlFilterChainBuilder((SAXTransformerFactory) TransformerFactory.newInstance()), "", "");
+            factory = new TranslationHandlerFactory(manager, "", "");
             TranslationConfig config = new TranslationConfig();
 
             RequestTranslations requestTranslations = new RequestTranslations();
@@ -236,10 +235,7 @@ public class TranslationHandlerTest {
             
             config.setRequestTranslations(requestTranslations);
             config.setResponseTranslations(responseTranslations);
-            Map<Class, UpdateListener<?>> listeners = factory.getListeners();
-            Iterator<Map.Entry<Class, UpdateListener<?>>> iterator = listeners.entrySet().iterator();
-            UpdateListener<TranslationConfig> listener = (UpdateListener<TranslationConfig>) iterator.next().getValue();
-            listener.configurationUpdated(config);
+            factory.configurationUpdated(config);
             handler = factory.buildHandler();
 
             mockedRequest = mock(HttpServletRequest.class);
@@ -266,13 +262,15 @@ public class TranslationHandlerTest {
             ServletInputStream response = new BufferedServletInputStream(this.getClass().getResourceAsStream("/empty.xml"));
             when(mockedRequest.getInputStream()).thenReturn(response);
             when(mockedRequest.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
 
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleRequest(mutableHttpRequest, mutableHttpResponse);
             String actual = new String(RawInputStreamReader.instance().readFully(mutableHttpRequest.getInputStream()));
-            final String expected = "<add-me>\n   <root/>\n</add-me>\n";
+            final String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><add-me><root/></add-me>";
 
             Diff diff1 = new Diff(expected, actual);
 
@@ -288,10 +286,11 @@ public class TranslationHandlerTest {
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
             when(mockedRequest.getContentType()).thenReturn("application/xml");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/xml");
 
             FilterDirector director = handler.handleRequest(mutableHttpRequest, mutableHttpResponse);
             String actual = new String(RawInputStreamReader.instance().readFully(mutableHttpRequest.getInputStream()));
-            final String expected = "<add-me>\n   <root>\n    This is  a test.\n</root>\n</add-me>";
+            final String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><add-me xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><root>\n    This is  a test.\n</root></add-me>";
 
             Diff diff1 = new Diff(expected, actual);
 
@@ -307,8 +306,10 @@ public class TranslationHandlerTest {
             when(mockedRequest.getHeader(eq("Accept"))).thenReturn("application/other");
             when(mockedRequest.getHeaders(eq("accept"))).thenReturn((Enumeration) new StringTokenizer("application/other"));
             when(mockedRequest.getContentType()).thenReturn("application/other");
+            when(mockedResponse.getHeader(eq("Content-Type"))).thenReturn("application/other");
             mutableHttpRequest = MutableHttpServletRequest.wrap((HttpServletRequest) mockedRequest);
             mutableHttpResponse = MutableHttpServletResponse.wrap(mockedRequest, mockedResponse);
+            mutableHttpResponse.setHeader("Content-Type", "application/xml");
 
             FilterDirector director = handler.handleRequest(mutableHttpRequest, mutableHttpResponse);
             String actual = new String(RawInputStreamReader.instance().readFully(mutableHttpRequest.getInputStream()));

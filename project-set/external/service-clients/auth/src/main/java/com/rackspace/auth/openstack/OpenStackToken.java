@@ -8,118 +8,144 @@ import org.openstack.docs.identity.api.v2.Role;
 import java.io.Serializable;
 import javax.xml.bind.JAXBElement;
 import org.openstack.docs.identity.api.v2.UserForAuthenticateResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author fran
  */
 public class OpenStackToken extends AuthToken implements Serializable {
 
-    private final String tenantId;
-    private final long expires;
-    private final String roles;
-    private final String tokenId;
-    private final String userId;
-    private final String username;
-    private final String impersonatorTenantId;
-    private final String impersonatorUsername;
+   private final String tenantId;
+   private final String tenantName;
+   private final long expires;
+   private final String roles;
+   private final String tokenId;
+   private final String userId;
+   private final String username;
+   private final String impersonatorTenantId;
+   private final String impersonatorUsername;
+   private static final Logger LOG = LoggerFactory.getLogger(OpenStackToken.class);
 
-    public OpenStackToken(String tenantId, AuthenticateResponse response) {
-        if (response == null || response.getToken() == null || response.getToken().getExpires() == null) {
-            throw new IllegalArgumentException("Invalid token");
-        }
+   public OpenStackToken(AuthenticateResponse response) {
+      
+      checkTokenInfo(response);
 
-        this.tenantId = tenantId;
-        this.expires = response.getToken().getExpires().toGregorianCalendar().getTimeInMillis();
-        this.roles = formatRoles(response);
-        this.tokenId = response.getToken().getId();
-        this.userId = response.getUser().getId();
-        this.username = response.getUser().getName();
-        UserForAuthenticateResponse impersonator =  getImpersonator(response);
-        if (impersonator != null) {
-            this.impersonatorTenantId = impersonator.getId();
-            this.impersonatorUsername = impersonator.getName();
-        } else {
-            this.impersonatorTenantId = "";
-            this.impersonatorUsername = "";
-        }
-    }
-    
-    public OpenStackToken(AuthenticateResponse response){
-       this(response.getUser().getId(), response);
-    }
-    
-    @Override
-    public String getTenantId() {
-        return tenantId;
-    }
+      this.tenantId = response.getToken().getTenant().getId();
+      this.tenantName = response.getToken().getTenant().getName();
+      this.expires = response.getToken().getExpires().toGregorianCalendar().getTimeInMillis();
+      this.roles = formatRoles(response);
+      this.tokenId = response.getToken().getId();
+      this.userId = response.getUser().getId();
+      this.username = response.getUser().getName();
+      UserForAuthenticateResponse impersonator = getImpersonator(response);
+      if (impersonator != null) {
+         this.impersonatorTenantId = impersonator.getId();
+         this.impersonatorUsername = impersonator.getName();
+      } else {
+         this.impersonatorTenantId = "";
+         this.impersonatorUsername = "";
+      }
+   }
 
-    @Override
-    public String getUserId() {
-        return userId;
-    }
+   private void checkTokenInfo(AuthenticateResponse response) {
+      if (response == null || response.getToken() == null || response.getToken().getExpires() == null) {
+         throw new IllegalArgumentException("Invalid token");
+      }
 
-    @Override
-    public String getTokenId() {
-        return tokenId;
-    }
+      if (response.getToken().getTenant() == null) {
+         throw new IllegalArgumentException("Invalid Response from Auth. Token object must have a tenant");
+      }
 
-    @Override
-    public long getExpires() {
-        return expires;
-    }
+      if (response.getUser() == null) {
+         throw new IllegalArgumentException("Invalid Response from Auth: Response must have a user object");
+      }
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
+      if (response.getUser().getRoles() == null) {
+         throw new IllegalArgumentException("Invalid Response from Auth: User must have a list of roles");
+      }
+      
+   }
 
-    @Override
-    public String getRoles() {
-        return roles;
-    }
+   @Override
+   public String getTenantId() {
+      return tenantId;
+   }
 
-    @Override
-    public String getImpersonatorTenantId() {
-        return impersonatorTenantId;
-    }
+   @Override
+   public String getTenantName() {
+      return this.tenantName;
+   }
 
-    @Override
-    public String getImpersonatorUsername() {
-        return impersonatorUsername;
-    }
+   @Override
+   public String getUserId() {
+      return userId;
+   }
 
-    private UserForAuthenticateResponse getImpersonator(AuthenticateResponse response) {
-        if (response.getAny() == null) {
-            return null;
-        }
-        
-        for (Object any: response.getAny()) {
-            if (any instanceof JAXBElement) {
-                JAXBElement element = (JAXBElement)any;
-                if (element.getValue() instanceof UserForAuthenticateResponse) {
-                    return (UserForAuthenticateResponse)element.getValue();
-                }
+   @Override
+   public String getTokenId() {
+      return tokenId;
+   }
+
+   @Override
+   public long getExpires() {
+      return expires;
+   }
+
+   @Override
+   public String getUsername() {
+      return username;
+   }
+
+   @Override
+   public String getRoles() {
+      return roles;
+   }
+
+   @Override
+   public String getImpersonatorTenantId() {
+      return impersonatorTenantId;
+   }
+
+   @Override
+   public String getImpersonatorUsername() {
+      return impersonatorUsername;
+   }
+
+   private UserForAuthenticateResponse getImpersonator(AuthenticateResponse response) {
+      if (response.getAny() == null) {
+         return null;
+      }
+
+      for (Object any : response.getAny()) {
+         if (any instanceof JAXBElement) {
+            JAXBElement element = (JAXBElement) any;
+            if (element.getValue() instanceof UserForAuthenticateResponse) {
+               return (UserForAuthenticateResponse) element.getValue();
             }
-        }
-        
-        return null;
-    }
+         }
+      }
 
-    private String formatRoles(AuthenticateResponse response) {
-        String formattedRoles = null;
+      return null;
+   }
 
-        if (response.getUser() != null && response.getUser().getRoles() != null) {
-            StringBuilder result = new StringBuilder();
-            for (Role role : response.getUser().getRoles().getRole()) {
-                result.append(role.getName());
-                result.append(",");
-            }
+   private String formatRoles(AuthenticateResponse response) {
+      String formattedRoles = null;
 
-            if (!StringUtilities.isBlank(result.toString())) {
-                formattedRoles = result.substring(0, result.length() - 1);
-            }
-        }
+      if (response.getUser() != null && response.getUser().getRoles() != null) {
+         StringBuilder result = new StringBuilder();
+         for (Role role : response.getUser().getRoles().getRole()) {
+            result.append(role.getName());
+            result.append(",");
+         }
 
-        return formattedRoles;
-    }
+         if (!StringUtilities.isBlank(result.toString())) {
+            formattedRoles = result.substring(0, result.length() - 1);
+         }else{
+            LOG.warn("User with userId " + response.getUser().getId() + " is not associated with any role");
+         }
+      }
+
+      return formattedRoles;
+   }
 }

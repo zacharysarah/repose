@@ -2,10 +2,10 @@ package com.rackspace.papi.filter.logic;
 
 import com.rackspace.papi.commons.util.http.HttpStatusCode;
 import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletRequest;
+import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletResponse;
 import com.rackspace.papi.commons.util.servlet.http.RouteDestination;
 import com.rackspace.papi.model.Destination;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -35,7 +35,7 @@ public class AbstractFilterDirector implements FilterDirector {
    }
 
    @Override
-   public void applyTo(HttpServletResponse response) {
+   public void applyTo(MutableHttpServletResponse response) {
       throw new UnsupportedOperationException(NOT_SUPPORTED_MESSAGE);
    }
 
@@ -110,12 +110,12 @@ public class AbstractFilterDirector implements FilterDirector {
    }
 
    @Override
-   public RouteDestination addDestination(String id, String uri, float quality) {
+   public RouteDestination addDestination(String id, String uri, double quality) {
       throw new UnsupportedOperationException(NOT_SUPPORTED_MESSAGE);
    }
 
    @Override
-   public RouteDestination addDestination(Destination dest, String uri, float quality) {
+   public RouteDestination addDestination(Destination dest, String uri, double quality) {
       throw new UnsupportedOperationException(NOT_SUPPORTED_MESSAGE);
    }
 

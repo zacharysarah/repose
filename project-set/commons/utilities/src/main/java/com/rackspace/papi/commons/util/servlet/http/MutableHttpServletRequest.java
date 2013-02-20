@@ -24,25 +24,30 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         return request instanceof MutableHttpServletRequest ? (MutableHttpServletRequest) request : new MutableHttpServletRequest(request);
     }
 
-    public static MutableHttpServletRequest wrap(HttpServletRequest request, int streamLimit) {
+    public static MutableHttpServletRequest wrap(HttpServletRequest request, long streamLimit) {
         return request instanceof MutableHttpServletRequest ? (MutableHttpServletRequest) request : new MutableHttpServletRequest(request, streamLimit);
     }
+    private static final String REQUEST_ID = "requestId";
     private ServletInputStream inputStream;
     private final RequestValues values;
-    private final int streamLimit;
+    private final long streamLimit;
 
     private MutableHttpServletRequest(HttpServletRequest request) {
-        super(request);
-
-        this.values = new RequestValuesImpl(request);
-        streamLimit = -1;
+      this(request, -1);
     }
 
-    private MutableHttpServletRequest(HttpServletRequest request, int streamLimit) {
+    private MutableHttpServletRequest(HttpServletRequest request, long streamLimit) {
         super(request);
 
+        if (getAttribute(REQUEST_ID) == null) {
+          setAttribute(REQUEST_ID, UUID.randomUUID().toString());
+        }
         this.values = new RequestValuesImpl(request);
         this.streamLimit = streamLimit;
+    }
+    
+    public String getRequestId() {
+      return (String) getAttribute(REQUEST_ID);
     }
 
     public void addDestination(String id, String uri, float quality) {
@@ -124,6 +129,10 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     public void setRequestUrl(StringBuffer requestUrl) {
         values.setRequestURL(requestUrl);
     }
+    
+    public void clearHeaders() {
+      values.getHeaders().clearHeaders();
+    }
 
     public void addHeader(String name, String value) {
         values.getHeaders().addHeader(name, value);
@@ -140,6 +149,10 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     @Override
     public String getHeader(String name) {
         return values.getHeaders().getHeader(name);
+    }
+
+    public HeaderValue getHeaderValue(String name) {
+        return values.getHeaders().getHeaderValue(name);
     }
 
     @Override

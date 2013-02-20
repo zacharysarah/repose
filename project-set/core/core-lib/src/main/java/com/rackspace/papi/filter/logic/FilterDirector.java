@@ -2,10 +2,10 @@ package com.rackspace.papi.filter.logic;
 
 import com.rackspace.papi.commons.util.http.HttpStatusCode;
 import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletRequest;
+import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletResponse;
 import com.rackspace.papi.commons.util.servlet.http.RouteDestination;
 import com.rackspace.papi.model.Destination;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -60,11 +60,11 @@ public interface FilterDirector {
 
    void applyTo(MutableHttpServletRequest request);
 
-   void applyTo(HttpServletResponse response) throws IOException;
+   void applyTo(MutableHttpServletResponse response) throws IOException;
 
-   RouteDestination addDestination(String id, String uri, float quality);
+   RouteDestination addDestination(String id, String uri, double quality);
 
-   RouteDestination addDestination(Destination dest, String uri, float quality);
+   RouteDestination addDestination(Destination dest, String uri, double quality);
    
    List<RouteDestination> getDestinations();
 }

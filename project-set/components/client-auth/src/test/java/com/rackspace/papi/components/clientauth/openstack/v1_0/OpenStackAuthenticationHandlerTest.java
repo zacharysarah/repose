@@ -45,6 +45,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import org.openstack.docs.identity.api.v2.RoleList;
+import org.openstack.docs.identity.api.v2.TenantForAuthenticateResponse;
 
 /**
  * @author zinic
@@ -76,7 +78,6 @@ public class OpenStackAuthenticationHandlerTest {
 
             osauthConfig = new OpenstackAuth();
             osauthConfig.setDelegable(delegable());
-            osauthConfig.setIncludeQueryParams(includeQueryParams());
             osauthConfig.setTenanted(isTenanted());
 
             keyedRegexExtractor = new KeyedRegexExtractor();
@@ -101,7 +102,7 @@ public class OpenStackAuthenticationHandlerTest {
             whiteListRegexPatterns = new ArrayList<Pattern>();
             whiteListRegexPatterns.add(Pattern.compile("/v1.0/application\\.wadl"));
 
-            Configurables configurables = new Configurables(delegable(), "http://some.auth.endpoint", keyedRegexExtractor, includeQueryParams(), isTenanted(), AUTH_GROUP_CACHE_TTL, AUTH_TOKEN_CACHE_TTL);
+            Configurables configurables = new Configurables(delegable(), "http://some.auth.endpoint", keyedRegexExtractor, isTenanted(), AUTH_GROUP_CACHE_TTL, AUTH_TOKEN_CACHE_TTL);
             handler = new OpenStackAuthenticationHandler(configurables, authService, null, null, new UriMatcher(whiteListRegexPatterns));
 
 
@@ -114,10 +115,6 @@ public class OpenStackAuthenticationHandlerTest {
         }
 
         protected abstract boolean delegable();
-
-        protected boolean includeQueryParams() {
-            return false;
-        }
 
         protected boolean isTenanted() {
             return true;
@@ -147,6 +144,8 @@ public class OpenStackAuthenticationHandlerTest {
             when(cti.getTokenId()).thenReturn(tokenId);
             when(cti.getUsername()).thenReturn(username);
             when(cti.getExpires()).thenReturn(expires);
+            when(cti.getTenantName()).thenReturn("tenantName");
+            when(cti.getTenantId()).thenReturn("tenantId");
 
             return cti;
         }
@@ -175,9 +174,15 @@ public class OpenStackAuthenticationHandlerTest {
             userForAuthenticateResponse.setId("104772");
             userForAuthenticateResponse.setName("user2");
 
+            userForAuthenticateResponse.setRoles(new RoleList());
+            
             Token token = new Token();
             token.setId("tokenId");
             token.setExpires(dataTypeFactory.newXMLGregorianCalendar((GregorianCalendar) expires));
+            TenantForAuthenticateResponse tenant = new TenantForAuthenticateResponse();
+            tenant.setId("tenantId");
+            tenant.setName("tenantName");
+            token.setTenant(tenant);
 
             authResponse.setToken(token);
             authResponse.setUser(userForAuthenticateResponse);
@@ -185,7 +190,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldCheckCacheForCredentials() throws IOException {
-            final AuthToken user = new OpenStackToken(null, authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             byte[] userInfoBytes = ObjectSerializer.instance().writeObject(user);
             when(authService.validateToken(anyString(), anyString())).thenReturn(user);
 
@@ -198,7 +203,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldUseCachedUserInfo() {
-            final AuthToken user = new OpenStackToken(null, authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             StoredElement element = mock(StoredElement.class);
             when(element.elementIsNull()).thenReturn(false);
             when(element.elementAs(AuthToken.class)).thenReturn(user);
@@ -215,7 +220,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldNotUseCachedUserInfoForExpired() throws InterruptedException {
-            final AuthToken user = new OpenStackToken(null, authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             StoredElement element = mock(StoredElement.class);
             when(element.elementIsNull()).thenReturn(false);
             when(element.elementAs(AuthToken.class)).thenReturn(user);
@@ -235,7 +240,7 @@ public class OpenStackAuthenticationHandlerTest {
         @Test
         public void shouldNotUseCachedUserInfoForBadTokenId() {
             authResponse.getToken().setId("differentId");
-            final AuthToken user = new OpenStackToken(null, authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             StoredElement element = mock(StoredElement.class);
             when(element.elementIsNull()).thenReturn(false);
             when(element.elementAs(AuthToken.class)).thenReturn(user);
@@ -280,9 +285,15 @@ public class OpenStackAuthenticationHandlerTest {
             UserForAuthenticateResponse userForAuthenticateResponse = new UserForAuthenticateResponse();
             userForAuthenticateResponse.setId("104772");
             userForAuthenticateResponse.setName("user2");
+            
+            userForAuthenticateResponse.setRoles(new RoleList());
 
             Token token = new Token();
             token.setId("tokenId");
+            TenantForAuthenticateResponse tenant = new TenantForAuthenticateResponse();
+            tenant.setId("tenantId");
+            tenant.setName("tenantName");
+            token.setTenant(tenant);
             token.setExpires(dataTypeFactory.newXMLGregorianCalendar((GregorianCalendar) expires));
 
             authResponse.setToken(token);
@@ -291,7 +302,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldCheckCacheForGroup() throws IOException {
-            final AuthToken user = new OpenStackToken("tenantId", authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             when(authService.validateToken(anyString(), anyString())).thenReturn(user);
 
             final FilterDirector director = handlerWithCache.handleRequest(request, response);
@@ -302,7 +313,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldUseCachedGroupInfo() {
-            final AuthToken user = new OpenStackToken("tenantId", authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             when(authService.validateToken(anyString(), anyString())).thenReturn(user);
 
             final AuthGroup authGroup = new OpenStackGroup(group);
@@ -325,7 +336,7 @@ public class OpenStackAuthenticationHandlerTest {
 
         @Test
         public void shouldNotUseCachedGroupInfoForExpired() throws InterruptedException {
-            final AuthToken user = new OpenStackToken("tenantId", authResponse);
+            final AuthToken user = new OpenStackToken(authResponse);
             when(authService.validateToken(anyString(), anyString())).thenReturn(user);
 
             StoredElement element = mock(StoredElement.class);
@@ -534,37 +545,11 @@ public class OpenStackAuthenticationHandlerTest {
         }
     }
 
-    public static class WhenPassingRequestWithUserInQueryParam extends TestParent {
-
-        @Override
-        protected boolean delegable() {
-            return true;
-        }
-
-        @Override
-        protected boolean includeQueryParams() {
-            return true;
-        }
-
-        @Test
-        public void shouldCatchUserNameInQueryParam() {
-            when(request.getRequestURI()).thenReturn("/v1.0/servers/service");
-            when(request.getQueryString()).thenReturn("crowd=huge&username=usertest1");
-            final FilterDirector requestDirector = handler.handleRequest(request, response);
-            assertTrue(requestDirector.requestHeaderManager().headersToAdd().get("x-authorization").toString().equalsIgnoreCase("[Proxy usertest1]"));
-        }
-    }
-
     public static class WhenPassingRequestWithOutUserInQueryParam extends TestParent {
 
         @Override
         protected boolean delegable() {
             return true;
-        }
-
-        @Override
-        protected boolean includeQueryParams() {
-            return false;
         }
 
         @Test

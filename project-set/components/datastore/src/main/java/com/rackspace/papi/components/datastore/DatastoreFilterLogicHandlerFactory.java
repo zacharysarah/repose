@@ -1,7 +1,9 @@
 package com.rackspace.papi.components.datastore;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
+import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.components.datastore.hash.HashRingDatastore;
+import com.rackspace.papi.domain.ReposeInstanceInfo;
 import com.rackspace.papi.filter.SystemModelInterrogator;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
 import com.rackspace.papi.model.Filter;
@@ -23,23 +25,27 @@ import java.util.*;
 public class DatastoreFilterLogicHandlerFactory extends AbstractConfiguredFilterHandlerFactory<DatastoreFilterLogicHandler> {
 
    private static final Logger LOG = LoggerFactory.getLogger(DatastoreFilterLogicHandlerFactory.class);
-   private static final DatastoreAccessControl DEFAULT_DATASTORE_ACL = new DatastoreAccessControl(Collections.EMPTY_LIST, true);
-   
+   private final DatastoreAccessControl DEFAULT_DATASTORE_ACL = new DatastoreAccessControl(Collections.EMPTY_LIST, false);
    private final MutableClusterView clusterView;
    private final HashRingDatastore hashRingDatastore;
    private DatastoreAccessControl hostACL;
+   private ReposeInstanceInfo instanceInfo;
+   private SystemModel curSystemModel;
+   private DistributedDatastoreConfiguration curDistributedDatastoreConfiguration;
+   private final Object configLock = new Object();
 
-   public DatastoreFilterLogicHandlerFactory(MutableClusterView clusterView, HashRingDatastore hashRingDatastore) {
+   public DatastoreFilterLogicHandlerFactory(MutableClusterView clusterView, HashRingDatastore hashRingDatastore, ReposeInstanceInfo instanceInfo) {
       this.clusterView = clusterView;
       this.hashRingDatastore = hashRingDatastore;
-      
+      this.instanceInfo = instanceInfo;
+
       hostACL = DEFAULT_DATASTORE_ACL;
-      
-      LOG.info("By default, the distributed datastore component is configured to "
-              + "start in allow-all mode meaning that any host can access, store "
-              + "and delete cached objects. Please configure this component if "
-              + "you wish to restrict access. This message may be ignored if you "
-              + "have already configured this component.");
+
+      LOG.info("By default, the distributed datastore component is configured to"
+              + " start in restricted mode. Meaning that only members of the current"
+              + " Repose nodes cluster will be able to access, store, and delete cached objects."
+              + " Please configure this component if you wish to grant access to other hosts. This "
+              + "message may be ignored if you have already configured this component");
    }
 
    @Override
@@ -51,24 +57,32 @@ public class DatastoreFilterLogicHandlerFactory extends AbstractConfiguredFilter
       return listeners;
    }
 
+   //TODO: Move this logic to a utility class. Maybe new SystemModel Interrogator?
+   private ReposeCluster getCurrentCluster(List<ReposeCluster> clusters, String clusterId) {
+
+      for (ReposeCluster cluster : clusters) {
+
+         if (StringUtilities.nullSafeEquals(clusterId, cluster.getId())) {
+            return cluster;
+         }
+      }
+
+      return null;
+   }
+
    protected void updateClusterMembers(SystemModel configuration) {
       try {
          final List<InetSocketAddress> cacheSiblings = new LinkedList<InetSocketAddress>();
-         
-         ReposeCluster domain = new SystemModelInterrogator(clusterView.getListenPorts()).getLocalServiceDomain(configuration);
 
-         for (Node node : domain.getNodes().getNode()) {
-            if (domain.getFilters() != null) {
-               for (Filter f : domain.getFilters().getFilter()) {
-                  if (f.getName().equals("dist-datastore")) {
-                     
-                     // TODO Model: Support https or other protocols
-                     final InetAddress hostAddress = InetAddress.getByName(node.getHostname());
-                     final InetSocketAddress hostSocketAddress = new InetSocketAddress(hostAddress, node.getHttpPort());
+         ReposeCluster cluster = getCurrentCluster(configuration.getReposeCluster(), instanceInfo.getClusterId());
 
-                     cacheSiblings.add(hostSocketAddress);
-                  }
-               }
+         //Adding all members of the current Repose Cluster to clusterView
+         if (cluster != null) {
+            for (Node node : cluster.getNodes().getNode()) {
+
+               final InetAddress hostAddress = InetAddress.getByName(node.getHostname());
+               final InetSocketAddress hostSocketAddress = new InetSocketAddress(hostAddress, node.getHttpPort());
+               cacheSiblings.add(hostSocketAddress);
             }
          }
 
@@ -80,48 +94,118 @@ public class DatastoreFilterLogicHandlerFactory extends AbstractConfiguredFilter
 
    private class DistributedDatastoreConfigurationListener implements UpdateListener<DistributedDatastoreConfiguration> {
 
+      private boolean isInitialized = false;
+
       @Override
       public void configurationUpdated(DistributedDatastoreConfiguration configurationObject) {
-         if (configurationObject.getAllowedHosts() != null) {
-            final List<InetAddress> newHostList = new LinkedList<InetAddress>();
-            
-            for (HostAccessControl host : configurationObject.getAllowedHosts().getAllow()) {
-               try {
-                  final InetAddress hostAddress = InetAddress.getByName(host.getHost());
-                  newHostList.add(hostAddress);
-               } catch(UnknownHostException uhe) {
-                  LOG.error("Unable to resolve name: " + host.getHost() + " - Ignoring this host. Reason: " + uhe.getMessage(), uhe);
-               }
-            }
 
-            final boolean allowAll = configurationObject.getAllowedHosts().isAllowAll();
-            
-            if (allowAll) {
-               LOG.info("The distributed datastore component is configured in allow-all mode meaning that any host can access, store and delete cached objects.");
-            } else {
-               LOG.info("The distributed datastore component has access controls configured meaning that only the configured hosts can access, store and delete cached objects.");
-            }
-
-            hostACL = new DatastoreAccessControl(newHostList, allowAll);
+         synchronized (configLock) {
+            curDistributedDatastoreConfiguration = configurationObject;
          }
+         updateAccessList();
+
+         isInitialized = true;
+      }
+
+      @Override
+      public boolean isInitialized() {
+         return isInitialized;
       }
    }
 
    private class SystemModelUpdateListener implements UpdateListener<SystemModel> {
 
+      private boolean isInitialized = false;
+
       @Override
       public void configurationUpdated(SystemModel configurationObject) {
-         if (configurationObject == null) {
+
+         synchronized (configLock) {
+            curSystemModel = configurationObject;
+         }
+         if (curSystemModel == null) {
             LOG.error("Power Proxy configuration was null - please check your configurations and error logs");
             return;
          }
 
          updateClusterMembers(configurationObject);
+         updateAccessList();
+         isInitialized = true;
+      }
+
+      @Override
+      public boolean isInitialized() {
+         return isInitialized;
       }
    }
 
    @Override
    protected DatastoreFilterLogicHandler buildHandler() {
-      return new DatastoreFilterLogicHandler(UUIDEncodingProvider.getInstance(), hashRingDatastore, hostACL);
+
+      if (!this.isInitialized()) {
+         return null;
+      }
+      synchronized (configLock) {
+         return new DatastoreFilterLogicHandler(UUIDEncodingProvider.getInstance(), hashRingDatastore, hostACL);
+      }
+   }
+
+   private List<InetAddress> getClusterMembers() {
+
+      ReposeCluster cluster = getCurrentCluster(curSystemModel.getReposeCluster(), instanceInfo.getClusterId());
+      final List<InetAddress> reposeClusterMembers = new LinkedList<InetAddress>();
+
+      for (Node node : cluster.getNodes().getNode()) {
+         try {
+            final InetAddress hostAddress = InetAddress.getByName(node.getHostname());
+            reposeClusterMembers.add(hostAddress);
+         } catch (UnknownHostException e) {
+            LOG.warn("Unable to resolve host: " + node.getHostname() + "for Node " + node.getId() + " in Repose Cluster " + instanceInfo.getClusterId());
+         }
+
+      }
+
+      return reposeClusterMembers;
+   }
+
+   private List<InetAddress> getConfiguredAllowedHosts() {
+
+      final List<InetAddress> configuredAllowedHosts = new LinkedList<InetAddress>();
+
+      for (HostAccessControl host : curDistributedDatastoreConfiguration.getAllowedHosts().getAllow()) {
+         try {
+            final InetAddress hostAddress = InetAddress.getByName(host.getHost());
+            configuredAllowedHosts.add(hostAddress);
+         } catch (UnknownHostException e) {
+            LOG.warn("Unable to resolve host: " + host.getHost());
+         }
+      }
+
+      return configuredAllowedHosts;
+   }
+
+   private void updateAccessList() {
+
+      synchronized (configLock) {
+         List<InetAddress> hostAccessList = new LinkedList<InetAddress>();
+         boolean allowAll = false;
+         if (curSystemModel != null) {
+            hostAccessList.addAll(getClusterMembers());
+         }
+         if (curDistributedDatastoreConfiguration != null) {
+
+            allowAll = curDistributedDatastoreConfiguration.getAllowedHosts().isAllowAll();
+            hostAccessList.addAll(getConfiguredAllowedHosts());
+         }
+
+         if (allowAll) {
+            LOG.info("The distributed datastore component is configured in allow-all mode meaning that any host can access, store and delete cached objects.");
+         } else {
+            LOG.info("The distributed datastore component has access controls configured meaning that only the configured hosts and cluster members "
+                    + "can access, store and delete cached objects.");
+         }
+         LOG.debug("Allowed Hosts: " + hostAccessList.toString());
+         hostACL = new DatastoreAccessControl(hostAccessList, allowAll);
+      }
    }
 }
