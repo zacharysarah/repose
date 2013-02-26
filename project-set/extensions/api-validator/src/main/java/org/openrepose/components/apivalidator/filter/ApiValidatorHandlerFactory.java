@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerFactory<ApiValidatorHandler> {
-
+    
+  
     private static final Logger LOG = LoggerFactory.getLogger(ApiValidatorHandlerFactory.class);
     private ValidatorConfiguration validatorConfiguration;
     private ValidatorInfo defaultValidator;
@@ -88,10 +89,15 @@ public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerF
                     return;
                 }
                 boolean found = false;
+                boolean loadedWADL=true;
 
                 for (ValidatorInfo info : validators) {
                     if (info.getUri() != null && getNormalizedPath(info.getUri()).equals(config.name())) {
-                        info.reinitValidator();
+                        if(loadedWADL){
+                          loadedWADL=info.reinitValidator();
+                        }else{
+                           info.reinitValidator(); 
+                        }
                         found = true;
                     }
                 }
@@ -102,9 +108,13 @@ public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerF
                     for (ValidatorInfo info : validators) {
                         info.reinitValidator();
                     }
+                }if(!loadedWADL){
+                   isInitialized=false;
+                }else{
+                   isInitialized=true;
                 }
             }
-             isInitialized=true;
+             
         }
           
        @Override
@@ -121,7 +131,7 @@ public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerF
         }
 
         LOG.info("Watching WADL: " + wadl);
-        manager.subscribeTo(wadl, wadlListener, new GenericResourceConfigurationParser());
+        manager.subscribeTo("api-validator",wadl, wadlListener, new GenericResourceConfigurationParser());
     }
 
     String getWadlPath(String uri) {
