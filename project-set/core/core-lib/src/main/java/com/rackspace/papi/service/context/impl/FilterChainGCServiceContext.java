@@ -5,7 +5,7 @@ import com.rackspace.papi.commons.util.thread.Poller;
 import com.rackspace.papi.commons.util.thread.RecurringTask;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ServiceContext;
-import com.rackspace.papi.service.filterchain.GarbageCollectionService;
+import com.rackspace.papi.service.grabagecollection.GarbageCollectionService;
 import com.rackspace.papi.service.threading.ThreadingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

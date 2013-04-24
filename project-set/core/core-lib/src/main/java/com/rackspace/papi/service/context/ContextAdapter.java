@@ -5,7 +5,7 @@ import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.container.ContainerConfigurationService;
 import com.rackspace.papi.service.datastore.DatastoreService;
 import com.rackspace.papi.service.event.common.EventService;
-import com.rackspace.papi.service.filterchain.GarbageCollectionService;
+import com.rackspace.papi.service.grabagecollection.GarbageCollectionService;
 import com.rackspace.papi.service.headers.request.RequestHeaderService;
 import com.rackspace.papi.service.headers.response.ResponseHeaderService;
 import com.rackspace.papi.service.logging.LoggingService;

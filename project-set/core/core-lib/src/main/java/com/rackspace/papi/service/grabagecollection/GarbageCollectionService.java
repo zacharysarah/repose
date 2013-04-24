@@ -1,4 +1,4 @@
-package com.rackspace.papi.service.filterchain;
+package com.rackspace.papi.service.grabagecollection;
 
 import com.rackspace.papi.commons.util.Destroyable;
 import com.rackspace.papi.filter.resource.ResourceMonitor;
