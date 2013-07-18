@@ -22,6 +22,7 @@
 
     <properties>
         <org.springframework.version>3.1.1.RELEASE</org.springframework.version>
+        <cobertura.version>2.0</cobertura.version>
     </properties>
 
     <modules>
@@ -34,6 +35,18 @@
         <module>installation</module>
         <module>management</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <profiles>
         <profile>
@@ -453,5 +466,60 @@
                 </dependency>
             </dependencies>
         </profile>
+ <!--
+        <profile>
+            <id>cobertura-instrument</id>
+            <activation>
+                <property>
+                    <name>cobertura-build</name>
+                </property>
+            </activation>
+            <modules>
+                <module>SomeProject-cobertura</module>
+            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <configuration>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>instrument-code</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>instrument</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <inherited>true</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.cobertura</groupId>
+                    <artifactId>cobertura-runtime</artifactId>
+                    <version>${cobertura.version}</version>
+                    <scope>provided</scope>
+                    <type>pom</type>
+                </dependency>
+            </dependencies>
+        </profile> -->
     </profiles>
 </project>

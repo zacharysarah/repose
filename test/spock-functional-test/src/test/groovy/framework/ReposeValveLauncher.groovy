@@ -11,6 +11,7 @@ class ReposeValveLauncher implements ReposeLauncher {
     def boolean debugEnabled
     def String reposeJar
     def String configDir
+    def String coberturaJar
 
     def clock = new SystemClock()
 
@@ -29,12 +30,15 @@ class ReposeValveLauncher implements ReposeLauncher {
                         String reposeEndpoint,
                         String configDir,
                         int reposePort,
-                        int shutdownPort) {
+                        int shutdownPort,
+                        String coberturaJar) {
         this.configurationProvider = configurationProvider
         this.reposeJar = reposeJar
         this.reposeEndpoint = reposeEndpoint
         this.shutdownPort = shutdownPort
         this.configDir = configDir
+        System.out.println(coberturaJar)
+        this.coberturaJar = coberturaJar
     }
 
     @Override
@@ -49,6 +53,7 @@ class ReposeValveLauncher implements ReposeLauncher {
 
     @Override
     void start() {
+        System.out.println(coberturaJar)
 
         waitForCondition(clock, '5s', '1s', {
             killIfUp()
@@ -71,7 +76,7 @@ class ReposeValveLauncher implements ReposeLauncher {
 
         }
 
-        def cmd = "java ${classPath} ${debugProps} ${jmxprops} -jar ${reposeJar} -s ${shutdownPort} -c ${configDir} start"
+        def cmd = "java ${classPath} ${debugProps} ${jmxprops} -cp ${reposeJar}:${coberturaJar} com.rackspace.cloud.valve.server.ProxyApp -s ${shutdownPort} -c ${configDir} start"
         println("Starting repose: ${cmd}")
 
         def th = new Thread({ cmd.execute() });

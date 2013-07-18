@@ -41,7 +41,8 @@ abstract class ReposeValveTest extends Specification {
                 reposeEndpoint,
                 configDirectory,
                 properties.getProperty("repose.port").toInteger(),
-                properties.getProperty("repose.shutdown.port").toInteger()
+                properties.getProperty("repose.shutdown.port").toInteger(),
+                properties.getProperty("cobertura.jar")
         )
         repose.enableDebug()
         reposeLogSearch = new ReposeLogSearch(logFile);

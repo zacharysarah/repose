@@ -80,6 +80,7 @@
             <properties>
 
                 <project.set.dir>${project.basedir}/../../project-set</project.set.dir>
+                <cobertura.jar>/Users/dimi5963/Downloads/cobertura-1.9.4.1/cobertura.jar</cobertura.jar>
 
                 <repose.valve.dir>${project.set.dir}/core/valve/target</repose.valve.dir>
                 <filter.dir>${project.set.dir}/components/filter-bundle/target</filter.dir>
@@ -203,6 +204,15 @@
 
         </testResources>
 
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
         <plugins>
             <plugin>
@@ -243,6 +253,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -256,4 +271,17 @@
             </snapshots>
         </repository>
     </repositories>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.4</version>
+         <configuration>
+      <aggregate>true</aggregate>
+            <forceMojoExecution>true</forceMojoExecution>
+          </configuration>
+           </plugin>
+        </plugins>
+    </reporting>
 </project>
