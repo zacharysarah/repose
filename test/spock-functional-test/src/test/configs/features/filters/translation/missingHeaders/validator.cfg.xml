@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<validators multi-role-match="true" xmlns="http://openrepose.org/repose/validator/v1.0">
+    
+    <validator 
+	default="true"
+        role="customer:observer" 
+        dot-output="customer_observer.dot" >
+         
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+            <resources base="http://localhost:8080" >
+                
+                <resource path="/"
+                          type="capabilities.wadl.xml#Get_ServiceProfile" />
+                
+            </resources>
+        </application>
+        
+    </validator>
+    
+    <validator 
+	default="false"
+        role="observer" 
+        dot-output="observer.dot" >
+         
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+            <resources base="http://localhost:8080" >
+                
+                <resource path="/"
+                          type="capabilities.wadl.xml#Get_Customer_Account capabilities.wadl.xml#Get_Customer_Account_Status_History capabilities.wadl.xml#Get_Contacts capabilities.wadl.xml#Get_Contact capabilities.wadl.xml#Get_Countries capabilities.wadl.xml#Get_Country capabilities.wadl.xml#Get_Contact_By_UserName" />
+                
+            </resources>
+        </application>
+        
+    </validator>
+    
+    <validator 
+	default="false"
+        role="admin" 
+        dot-output="admin.dot" >
+         
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+            <resources base="http://localhost:8080" >
+                
+                <resource path="/"
+                          type="capabilities.wadl.xml#Get_Customer_Account capabilities.wadl.xml#Get_Customer_Account_Status_History capabilities.wadl.xml#Get_Contacts capabilities.wadl.xml#Get_Contact capabilities.wadl.xml#Get_Countries capabilities.wadl.xml#Get_Country capabilities.wadl.xml#Add_Contact capabilities.wadl.xml#Update_Contact capabilities.wadl.xml#Delete_Contact capabilities.wadl.xml#Get_Contact_By_UserName" />
+                
+            </resources>
+        </application>
+        
+    </validator>
+    
+    <validator 
+	default="false"
+        role="identity:user-admin" 
+        dot-output="identity_user-admin.dot" >
+         
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+            <resources base="http://localhost:8080" >
+                
+                <resource path="/"
+                          type="capabilities.wadl.xml#Get_Customer_Account capabilities.wadl.xml#Get_Customer_Account_Status_History capabilities.wadl.xml#Get_Contacts capabilities.wadl.xml#Get_Contact capabilities.wadl.xml#Get_Countries capabilities.wadl.xml#Get_Country capabilities.wadl.xml#Add_Contact capabilities.wadl.xml#Update_Contact capabilities.wadl.xml#Delete_Contact capabilities.wadl.xml#Get_Contact_By_UserName" />
+                
+            </resources>
+        </application>
+        
+    </validator>
+    
+    <validator 
+	default="false"
+        role="customer:admin" 
+        dot-output="customer_admin.dot" >
+         
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+            <resources base="http://localhost:8080" >
+                
+                <resource path="/"
+                          type="capabilities.wadl.xml#Get_Customer_Account capabilities.wadl.xml#Get_Customer_Account_Status_History capabilities.wadl.xml#Get_Contacts capabilities.wadl.xml#Get_Contact capabilities.wadl.xml#Get_Countries capabilities.wadl.xml#Get_Country capabilities.wadl.xml#Get_Contact_By_UserName" />
+                
+            </resources>
+        </application>
+        
+    </validator>
+    
+</validators>

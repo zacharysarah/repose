@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://wiki.openrepose.org/display/REPOSE/Translation -->
+<translation xmlns="http://docs.rackspacecloud.com/repose/translation/v1.0">
+    <request-translations>
+        <request-translation 
+            http-methods="ALL" 
+            content-type="*/*" 
+            accept="*/*"
+            translated-content-type="">
+            <style-sheets>
+                <style id="cs4" href="header-transform.xsl" />
+            </style-sheets>
+        </request-translation>
+    </request-translations>
+    
+
+</translation>

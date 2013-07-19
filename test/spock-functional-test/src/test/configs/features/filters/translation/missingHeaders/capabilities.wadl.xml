@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <resource_type id="Get_Customer_Account">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <method name="GET">
+            <doc title="Get Customer Account"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_Customer_Account_Status_History">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/status_history">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <method name="GET">
+            <doc title="Get Customer Account Status History"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_Contacts">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contacts">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <method name="GET">
+            <doc title="Get Contacts"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_Contact">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contacts/{contactNumber}">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <param style="template" type="xs:string" name="contactNumber"/>
+         <method name="GET">
+            <doc title="Get Contact"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_Contact_By_UserName">
+        <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contact_usernames/{username}">
+            <param style="template" type="xs:string" name="tenantId"/>
+            <param style="template" type="xs:string" name="username"/>
+            <method name="GET">
+                <doc title="Get Contact By UserName">
+                    WRITEME
+                </doc>
+            </method>
+        </resource>
+    </resource_type>
+   <resource_type id="Get_Countries">
+      <resource path="/v1/countries">
+         <method name="GET">
+            <doc title="Get Countries"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_Country">
+      <resource path="/v1/countries/{countryCode}">
+         <param style="template" type="xs:string" name="countryCode"/>
+         <method name="GET">
+            <doc title="Get Country"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Add_Contact">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contacts">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <method name="POST">
+            <doc title="Add Contact"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Update_Contact">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contacts/{contactNumber}">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <param style="template" type="xs:string" name="contactNumber"/>
+         <method name="PUT">
+            <doc title="Update Contact"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Delete_Contact">
+      <resource path="/v1/customer_accounts/CLOUD/{tenantId}/contacts/{contactNumber}">
+         <param style="template" type="xs:string" name="tenantId"/>
+         <param style="template" type="xs:string" name="contactNumber"/>
+         <method name="DELETE">
+            <doc title="Delete Contact"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>
+   <resource_type id="Get_ServiceProfile">
+      <resource path="/v1">
+         <method name="GET">
+            <doc title="Service Profile"> 
+                        WRITEME
+                    </doc>
+         </method>
+      </resource>
+   </resource_type>   
+</application>
