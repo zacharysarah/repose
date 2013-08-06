@@ -16,6 +16,7 @@
     <modules>
         <module>rate-limiting-service</module>
         <module>reporting-service</module>
+    <module>logging</module>
   </modules>
 
 </project>

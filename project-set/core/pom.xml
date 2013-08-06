@@ -20,7 +20,10 @@
       <module>core-lib</module>
       <module>web-application</module>
       <module>valve</module>
-   </modules>
+    <module>filter-library</module>
+    <module>httpx-library</module>
+    <module>mavenproject1</module>
+  </modules>
     
    <dependencyManagement>
       <dependencies>
@@ -41,6 +44,7 @@
             <artifactId>core-lib</artifactId>
             <version>${project.version}</version>
          </dependency>
+         
          
          <dependency>
             <groupId>com.rackspace.papi.external</groupId>
@@ -80,4 +84,3 @@
       </dependencies>
    </dependencyManagement>
 </project>
-

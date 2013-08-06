@@ -47,6 +47,11 @@
             <artifactId>jetty-container</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.rackspace.papi.filter</groupId>
+            <artifactId>filter-library</artifactId>
+            <version>2.6.12-SNAPSHOT</version>
+        </dependency>
     </dependencies>
    
     <build>
