@@ -42,7 +42,8 @@ class ReposeConfigurationProvider {
         }
     }
 
-    void updateConfigs(String[] configLocations) {
+    void updateConfigs(int timeout, String[] configLocations) {
+        def timeoutInSec = timeout + 's'
         configLocations.each { configs ->
             FileUtils.copyDirectory(new File(samplesDir.absolutePath + "/" + configs), reposeConfigDir)
         }
@@ -51,7 +52,9 @@ class ReposeConfigurationProvider {
         // TODO: add some conditional check here to only sleep until the configs have been reloaded
         // For now, we know that configs get checked every 15 seconds, so sleep a bit longer than this... suckaroos
         try {
-            waitForCondition(clock, '25s', '1s', {
+            println ("waiting on configs to be updated")
+            waitForCondition(clock, timeoutInSec, '1s', {
+                print(".")
                 false
             })
         } catch (TimeoutException e) {

@@ -12,5 +12,7 @@ interface ReposeLauncher {
 
     void updateConfigs(String[] configLocations)
 
+    void updateConfigs(int secsToWait, String[] configLocations)
+
     void addToClassPath(String path)
 }

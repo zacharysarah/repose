@@ -45,8 +45,14 @@ class ReposeValveLauncher implements ReposeLauncher {
     }
 
     @Override
+    void updateConfigs(int secsToWait, String[] configLocations) {
+        configurationProvider.updateConfigs(secsToWait, configLocations)
+    }
+
+
+    @Override
     void updateConfigs(String[] configLocations) {
-        configurationProvider.updateConfigs(configLocations)
+        configurationProvider.updateConfigs(25, configLocations)
     }
 
     @Override
