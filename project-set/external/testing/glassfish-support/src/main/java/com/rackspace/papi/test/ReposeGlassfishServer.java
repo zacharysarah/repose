@@ -91,7 +91,7 @@ public class ReposeGlassfishServer {
         File war = new File(reposeRootWar);
 
         archive.addMetadata(war);
-        archive.addMetadata(new File("resources", "sun-web.xml"));
+        archive.addMetadata(new File("resources", "domain.xml"));
 
         Deployer deployer = glassfish.getDeployer();
         deployer.deploy(war, "--name=repose", "--contextroot=repose", "--force=true");
