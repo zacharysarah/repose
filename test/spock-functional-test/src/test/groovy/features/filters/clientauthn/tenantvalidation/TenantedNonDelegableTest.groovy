@@ -50,6 +50,9 @@ class TenantedNonDelegableTest extends ReposeValveTest{
         fakeIdentityService.doesTenantHaveAdminRoles = tenantWithAdminRole
         fakeIdentityService.client_tenant = reqTenant
         fakeIdentityService.client_userid = reqTenant
+        fakeIdentityService.isValidateClientTokenBroken = validateClientBroken
+        fakeIdentityService.isGetAdminTokenBroken = getAdminTokenBroken
+        fakeIdentityService.isGetGroupsBroken = getGroupsBroken
         MessageChain mc = deproxy.makeRequest(reposeEndpoint + "/servers/" + reqTenant + "/", 'GET', ['content-type': 'application/json', 'X-Auth-Token': fakeIdentityService.client_token])
 
         then: "Request body sent from repose to the origin service should contain"
@@ -62,6 +65,8 @@ class TenantedNonDelegableTest extends ReposeValveTest{
             request2.headers.contains("X-Default-Region")
             request2.headers.getFirstValue("X-Default-Region") == "the-default-region"
         }
+
+        mc.receivedResponse.headers.contains("www-authenticate") == www_auth_header
 
         when: "User passes a request through repose the second time"
         mc = deproxy.makeRequest(reposeEndpoint + "/servers/" + reqTenant + "/", 'GET', ['X-Auth-Token': fakeIdentityService.client_token])
@@ -77,13 +82,16 @@ class TenantedNonDelegableTest extends ReposeValveTest{
         }
 
         where:
-        reqTenant | tenantMatch | tenantWithAdminRole | isAuthed | isAdminAuthed | responseCode | handlings | orphanedHandlings | cachedOrphanedHandlings | cachedHandlings
-        111       | false       | false               | true     | false         | "500"        | 0         | 1                 | 1                       | 0
-        222       | true        | true                | true     | true          | "200"        | 1         | 3                 | 0                       | 1
-        333       | true        | false               | true     | true          | "200"        | 1         | 2                 | 0                       | 1
-        444       | false       | true                | true     | true          | "200"        | 1         | 2                 | 1                       | 1
-        555       | false       | false               | true     | true          | "401"        | 0         | 1                 | 1                       | 0
-        666       | false       | false               | false    | true          | "401"        | 0         | 1                 | 1                       | 0
+        reqTenant | tenantMatch | tenantWithAdminRole | isAuthed | isAdminAuthed | responseCode | handlings | orphanedHandlings | cachedOrphanedHandlings | cachedHandlings | www_auth_header | validateClientBroken | getAdminTokenBroken | getGroupsBroken
+        111       | false       | false               | true     | false         | "500"        | 0         | 1                 | 1                       | 0               | false           | false                | false               | false
+        888       | true        | true                | true     | true          | "500"        | 0         | 1                 | 1                       | 0               | false           | false                | true                | false
+        222       | true        | true                | true     | true          | "200"        | 1         | 3                 | 0                       | 1               | false           | false                | false               | false
+        333       | true        | false               | true     | true          | "200"        | 1         | 2                 | 0                       | 1               | false           | false                | false               | false
+        444       | false       | true                | true     | true          | "200"        | 1         | 2                 | 1                       | 1               | false           | false                | false               | false
+        555       | false       | false               | true     | true          | "401"        | 0         | 1                 | 1                       | 0               | true            | false                | false               | false
+        666       | false       | false               | false    | true          | "401"        | 0         | 1                 | 1                       | 0               | true            | false                | false               | false
+        777       | true        | true                | true     | true          | "500"        | 0         | 1                 | 1                       | 0               | false           | true                 | false               | false
+        100       | true        | true                | true     | true          | "500"        | 1         | 2                 | 1                       | 0               | false           | false                | false               | true
     }
 
 

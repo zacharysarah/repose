@@ -1,13 +1,16 @@
 package features.core.powerfilter
 
 import framework.ReposeValveTest
+import framework.category.Slow
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.Response
 
 import java.util.concurrent.TimeoutException
+import org.junit.experimental.categories.Category
 
 /* Checks to see if having Unstable filter chain on startup due to configuration errors will log errors into the log file */
 
+@Category(Slow)
 class FilterChainUnstableTest extends ReposeValveTest{
     static int requestCount = 1
     def handler5XX = { request -> return new Response(503, 'SERVICE UNAVAILABLE') }
