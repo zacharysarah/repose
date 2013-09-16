@@ -58,7 +58,7 @@ class ResponseCodeJMXTest extends ReposeValveTest {
         repose.jmx.getMBeanAttribute(ALL_5XX, "Count") == null
 
         responses.each { MessageChain mc ->
-            mc.receivedResponse.code == 200
+            assert(mc.receivedResponse.code == 300)
         }
     }
 

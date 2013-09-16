@@ -6,6 +6,8 @@ import org.joda.time.DateTime
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.MessageChain
 import spock.lang.Unroll
+import org.junit.experimental.categories.Category
+import framework.category.Bug
 
 class RackspaceAuthTest extends ReposeValveTest {
 
@@ -78,18 +80,44 @@ class RackspaceAuthTest extends ReposeValveTest {
         where:
          request                 | user     | token    | isUserAuthed | responseCode | handlings | orphanedHandlings | cachedOrphanedHandlings | cachedHandlings | contentType | groupsRetrieved
 /* fail belongsto */     "/v1/"  | "rando2" | "toke1"  | false        | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
-/* fail groups --this should be a 401!!!    */     "/v1/"  | "rando3" | "toke2"  | true         | "200"        | 1         | 2                 | 1                       | 1               | "xml"       | false
 /* empty user & token */ "/v1/"  | null     | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
 /* empty token */        "/v1/"  | "rando4" | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
 /* empty user  */        "/v1/"  | null     | "toke3"  | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
 /* success     */        "/v1/"  | "rando5" | "toke4"  | true         | "200"        | 1         | 2                 | 0                       | 1               | "xml"       | true
 /* fail belongsto */     "/v1/"  | "rando6" | "toke5"  | false        | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
-/* fail groups -- this should be a 401!!! */        "/v1/"  | "rando7" | "toke6"  | true         | "200"        | 1         | 2                 | 1                       | 1               | "json"      | false
 /* empty user & token */ "/v1/"  | null     | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
 /* empty token */        "/v1/"  | "rando8" | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
 /* empty user  */        "/v1/"  | null     | "toke7"  | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
 /* success     */        "/v1/"  | "rando9" | "toke8"  | true         | "200"        | 1         | 2                 | 0                       | 1               | "json"      | true
     }
 
+    @Category(Bug)
+    def "rackspace auth should return 401 when unable to retrieve groups"() {
+
+        fakeIdentityService.client_token = token
+        fakeIdentityService.isTokenAuthenticated = true
+        fakeIdentityService.isAbleToGetGroups = false
+
+        when: "User passes a request through repose"
+        MessageChain mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+
+        then: "Request body sent from repose to the origin service should contain"
+        mc.receivedResponse.code == "401"
+        mc.handlings.size() == 0
+        mc.orphanedHandlings.size() == 1
+
+        when: "User passes a request through repose the second time"
+        mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+
+        then: "Request body sent from repose to the origin service should contain"
+        mc.receivedResponse.code == "401"
+        mc.handlings.size() == 0
+        mc.orphanedHandlings.size() == 1
+
+        where:
+        user     | token   | contentType
+        "rando3" | "toke2" | "xml"
+        "rando7" | "toke6" | "json"
+    }
 
 }
