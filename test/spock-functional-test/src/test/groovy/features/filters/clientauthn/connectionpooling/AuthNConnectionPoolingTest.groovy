@@ -6,6 +6,7 @@ import framework.ReposeConfigurationProvider
 import framework.ReposeLogSearch
 import framework.ReposeValveLauncher
 import framework.ReposeValveTest
+import org.joda.time.DateTime
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.DeproxyEndpoint
 import org.rackspace.gdeproxy.Handling
@@ -45,7 +46,14 @@ class AuthNConnectionPoolingTest extends ReposeValveTest {
 
 
         when: "making two authenticated requests to Repose"
+        identityService.client_token = "token1"
+        identityService.client_userid = "token1"
+        identityService.tokenExpiresAt = (new DateTime()).plusDays(1);
         def mc1 = deproxy.makeRequest(url: url, headers: ['X-Auth-Token': 'token1'])
+        identityService.client_token = "token2"
+        identityService.client_userid = "token2"
+
+        identityService.tokenExpiresAt = (new DateTime()).plusDays(1);
         def mc2 = deproxy.makeRequest(url: url, headers: ['X-Auth-Token': 'token2'])
         // collect all of the handlings that make it to the identity endpoint into one list
         def allOrphanedHandlings = mc1.orphanedHandlings + mc2.orphanedHandlings

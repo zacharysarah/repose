@@ -40,9 +40,6 @@ class TranslationRequestTest extends ReposeValveTest {
     //Start repose once for this particular translation test
     def setupSpec() {
 
-        deproxy = new Deproxy()
-        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
-
         repose.applyConfigs(
                 "features/filters/translation/common",
                 "features/filters/translation/request"
@@ -50,12 +47,14 @@ class TranslationRequestTest extends ReposeValveTest {
         repose.start()
         deproxy = new Deproxy()
         deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
+
     }
 
     def cleanupSpec() {
-        deproxy.shutdown()
-        repose.stop()
-        deproxy.shutdown()
+        if(deproxy)
+            deproxy.shutdown()
+        if(repose)
+            repose.stop()
     }
 
     @Unroll("response: xml, request: #reqHeaders - #reqBody")

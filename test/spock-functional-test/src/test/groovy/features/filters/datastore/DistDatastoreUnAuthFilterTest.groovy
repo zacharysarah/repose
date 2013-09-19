@@ -25,7 +25,7 @@ class DistDatastoreUnAuthFilterTest extends ReposeValveTest {
             }
         }
 
-        return "localhost"
+        throw new Exception("cannot find valid address")
     }
 
     def tempEndpoint = reposeEndpoint.replaceAll("localhost",host)

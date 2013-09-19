@@ -16,11 +16,10 @@ class HeaderIdMappingTest extends ReposeValveTest {
     def static Map headersIdMulti = ["x-rax-user": user2+","+user1, "x-rax-groups": "reposegroup1"]
 
     def setupSpec() {
-        deproxy = new Deproxy()
-        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
-
         repose.applyConfigs("features/filters/headeridmapping")
         repose.start()
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
         waitUntilReadyToServiceRequests()
     }
 

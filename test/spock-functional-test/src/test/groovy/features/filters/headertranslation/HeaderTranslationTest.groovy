@@ -18,8 +18,10 @@ class HeaderTranslationTest extends ReposeValveTest {
     }
 
     def cleanupSpec() {
-        deproxy.shutdown()
-        repose.stop()
+        if(deproxy)
+            deproxy.shutdown()
+        if(repose)
+            repose.stop()
     }
 
     def "when translating request headers one-to-one without removal"() {

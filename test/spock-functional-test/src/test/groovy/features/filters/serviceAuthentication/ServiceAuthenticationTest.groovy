@@ -10,12 +10,11 @@ class ServiceAuthenticationTest extends ReposeValveTest {
 
 
     def setupSpec() {
+        repose.applyConfigs( "features/filters/serviceAuthentication" )
+        repose.start()
 
         deproxy = new Deproxy()
         deproxy.addEndpoint( properties.getProperty( "target.port" ).toInteger() )
-
-        repose.applyConfigs( "features/filters/serviceAuthentication" )
-        repose.start()
     }
 
     def cleanupSpec() {
