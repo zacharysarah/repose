@@ -29,6 +29,9 @@ class TranslationSaxonEEFunctionalityTest extends ReposeValveTest {
     //Start repose once for this particular translation test
     def setupSpec() {
 
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
+
         def saxonHome = System.getenv("SAXON_HOME")
 
         assert saxonHome != null

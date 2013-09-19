@@ -6,17 +6,35 @@ import org.junit.experimental.categories.Category
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.Handling
 import org.rackspace.gdeproxy.MessageChain
+import org.rackspace.gdeproxy.PortFinder
+import spock.lang.Shared
 
 @Category(Slow.class)
 class IpIdentityTest extends ReposeValveTest {
 
+    @Shared
+    def url
     def setupSpec() {
+        PortFinder pf = new PortFinder()
+        int deproxyPort = pf.getNextOpenPort()
+        int reposePort = pf.getNextOpenPort()
         deproxy = new Deproxy()
-        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
+        deproxy.addEndpoint(deproxyPort)
 
-        repose.applyConfigs("features/filters/ipidentity")
+        url = "http://localhost:${reposePort}"
+
+        repose.configurationProvider.cleanConfigDirectory()
+        repose.configurationProvider.applyConfigsRuntime(
+                "common",
+                ["reposePort": reposePort.toString(),
+                        "targetPort": deproxyPort.toString()]);
+        repose.configurationProvider.applyConfigsRuntime(
+                "features/filters/ipidentity",
+                ["reposePort": reposePort.toString(),
+                        "targetPort": deproxyPort.toString()]);
         repose.start()
-        waitUntilReadyToServiceRequests()
+        repose.waitForNon500FromUrl(url)
+//        waitUntilReadyToServiceRequests()
     }
 
     def cleanupSpec() {

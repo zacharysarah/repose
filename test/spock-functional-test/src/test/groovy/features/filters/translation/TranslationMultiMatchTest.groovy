@@ -26,18 +26,20 @@ class TranslationMultiMatchTest extends ReposeValveTest {
     //Start repose once for this particular translation test
     def setupSpec() {
 
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
+
         repose.applyConfigs(
                 "features/filters/translation/common",
                 "features/filters/translation/multimatch"
         )
         repose.start()
-        deproxy = new Deproxy()
-        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
     }
 
     def cleanupSpec() {
         deproxy.shutdown()
         repose.stop()
+        deproxy.shutdown()
     }
 
     def "when translating responses"() {

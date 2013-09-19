@@ -1,7 +1,6 @@
 package features.filters.headerNormalization
 
 import framework.ReposeConfigurationProvider
-import framework.ReposeLogSearch
 import framework.ReposeValveLauncher
 import framework.ReposeValveTest
 import framework.category.Slow
@@ -25,7 +24,6 @@ class HeaderNormalizationJMXTest extends ReposeValveTest {
     String HEADER_NORMALIZATION_SECONDARY_PATH_GET = "${PREFIX},name=\"/secondary/path/(.\\*)_GET\""
     String HEADER_NORMALIZATION_TERTIARY_PATH_GET = "${PREFIX},name=\"/tertiary/path/(.\\*)_GET\""
     String HEADER_NORMALIZATION_ACROSS_ALL = "${PREFIX},name=\"ACROSS ALL\""
-
 
     def cleanup() {
         deproxy.shutdown()
