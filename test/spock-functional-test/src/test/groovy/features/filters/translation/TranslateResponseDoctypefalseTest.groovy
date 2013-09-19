@@ -46,33 +46,24 @@ class TranslateResponseDoctypefalseTest extends ReposeValveTest {
         repose.stop()
     }
 
-    @Unroll("request: #reqHeaders, response: #respHeaders - #respBody with request: #requestUri")
-    def "when translating responses"() {
+    @Unroll("response: #respBody")
+    def "when translating xml responses with doctype set to failse"() {
 
-        given: "Origin service returns body of type " + respHeaders
-        def xmlResp = { request -> return new Response(200, "OK", respHeaders, respBody) }
+        given: "Origin service returns body of type " + contentXML
+        def xmlResp = { request -> return new Response(200, "OK", contentXML, respBody) }
 
 
         when: "User sends requests through repose"
-        def resp = deproxy.makeRequest((String) reposeEndpoint + requestUri, method, reqHeaders, "something", xmlResp)
+        def resp = deproxy.makeRequest((String) reposeEndpoint + "/translation/responsedocfalse/123", "POST", acceptXML, "something", xmlResp)
 
-        then: "Response body should contain"
-        for (String st : shouldContain) {
-            resp.receivedResponse.body.contains(st)
-        }
-
-        and: "Response body should not contain"
-        for (String st : shouldNotContain) {
-            !resp.receivedResponse.body.contains(st)
-        }
-
-        and: "Response code should be"
-        resp.receivedResponse.code.equalsIgnoreCase(respCode.toString())
+        then: "Response code should be"
+        resp.receivedResponse.code == "500"
 
         where:
-        reqHeaders | respHeaders    | respBody                   | respCode | shouldContain  | shouldNotContain         | requestUri                          | method
-        acceptXML  | contentXML     | xmlResponseWithEntities    | 500      | ["\"somebody"] | [remove]                 | "/translation/responsedocfalse/123" | "POST"
-        acceptXML  | contentXML     | xmlResponseWithExtEntities | 500      | ["\"somebody"] | [remove]                 | "/translation/responsedocfalse/123" | "POST"
+        respBody << [
+                xmlResponseWithEntities,
+                xmlResponseWithExtEntities
+        ]
 
     }
 

@@ -2,8 +2,10 @@ package features.filters.clientauthn.cache
 import features.filters.clientauthn.AtomFeedResponseSimulator
 import features.filters.clientauthn.IdentityServiceResponseSimulator
 import framework.ReposeValveTest
+import framework.category.Slow
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.MessageChain
+import org.junit.experimental.categories.Category
 /**
  B-48277
  Use the Identity Atom Feed to Clear Deleted, Disabled, and Revoked Tokens from Cache
@@ -79,6 +81,7 @@ import org.rackspace.gdeproxy.MessageChain
  assert response code from repose is 401
 
  */
+@Category(Slow)
 class InvalidateCacheUsingAtomFeedTest extends ReposeValveTest {
 
     def originEndpoint

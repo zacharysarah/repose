@@ -53,40 +53,25 @@ class TranslationRequestDoctypefalseTest extends ReposeValveTest {
         repose.stop()
     }
 
-    @Unroll("response: #respHeaders, request: #reqHeaders - #reqBody")
+    @Unroll("response: xml, request: #reqBody")
     def "when translating requests"() {
 
         given: "Repose is configured to translate requests"
-        def xmlResp = { request -> return new Response(200, "OK", respHeaders) }
+        def xmlResp = { request -> return new Response(200, "OK", contentXML) }
 
 
         when: "User passes a request through repose"
-        def resp = deproxy.makeRequest((String) reposeEndpoint + requestUri, method, reqHeaders, reqBody, xmlResp)
-        def sentRequest = ((MessageChain) resp).handlings[0]
+        def resp = deproxy.makeRequest((String) reposeEndpoint + "/translation/requestdocfalse/echobody", "POST", acceptXML + contentXML, reqBody, xmlResp)
 
         then: "Request body sent from repose to the origin service should contain"
 
-        resp.receivedResponse.code == responseCode
-
-        if(responseCode != "400"){
-            for (String st : shouldContain) {
-                sentRequest.request.body.contains(st)
-            }
-        }
-
-
-        and: "Request body sent from repose to the origin service should not contain"
-
-        if(responseCode != "400"){
-            for (String st : shouldNotContain) {
-                !sentRequest.request.body.contains(st)
-            }
-        }
+        resp.receivedResponse.code == "400"
 
         where:
-        reqHeaders                 | respHeaders | reqBody                   | shouldContain  | shouldNotContain | method | requestUri                          | responseCode
-        /* translation filter for this MUST GO ABOVE default translation filter */ acceptXML + contentXML     | contentXML  | xmlPayloadWithEntities    | ["\"somebody"] | [remove]         | "POST" | "/translation/requestdocfalse/echobody"  | "400"
-        /* translation filter for this MUST GO ABOVE default translation filter */ acceptXML + contentXML     | contentXML  | xmlPayloadWithExtEntities | ["\"somebody"] | [remove]         | "POST" | "/translation/requestdocfalse/echobody"  | "400"
+        reqBody << [
+                xmlPayloadWithEntities,
+                xmlPayloadWithExtEntities
+        ]
     }
 
 }

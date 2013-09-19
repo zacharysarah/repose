@@ -69,7 +69,7 @@ class DistDatastoreUnAuthFilterTest extends ReposeValveTest {
 
     def "when checking cache object time to live"(){
         given:
-        def headers = ['X-PP-Host-Key':'temp', 'x-ttl':'5']
+        def headers = ['X-PP-Host-Key':'temp', 'x-ttl':'2']
         def objectkey = '8e969a44-990b-de49-d894-cf200b7d4c11'
         def body = "test data"
         MessageChain mc =
@@ -82,7 +82,7 @@ class DistDatastoreUnAuthFilterTest extends ReposeValveTest {
                     ])
 
         when:
-        Thread.sleep(7500)
+        Thread.sleep(2500)
         mc =
             deproxy.makeRequest(
                     [

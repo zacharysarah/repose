@@ -6,16 +6,18 @@ import framework.category.Slow
 import org.junit.experimental.categories.Category
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.MessageChain
-import org.rackspace.gdeproxy.Request
 import org.rackspace.gdeproxy.Response
 import spock.lang.Unroll
 
 import java.util.zip.Deflater
 import java.util.zip.GZIPOutputStream
 
-class CompressionHeaderTest extends ReposeValveTest {
+@Category(Slow.class)
+class CompressionTranslationTest extends ReposeValveTest {
     def static String content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pretium non mi ac " +
             "malesuada. Integer nec est turpis duis."
+    def static String xmlResponseWithExtEntities = "<?xml version=\"1.0\" standalone=\"no\" ?> <!DOCTYPE a [  <!ENTITY license_agreement SYSTEM \"http://www.mydomain.com/license.xml\"> ]>  <a><remove-me>test</remove-me>&quot;somebody&license_agreement;</a>"
+    def static String xmlResponseWithXmlBomb = "<?xml version=\"1.0\"?> <!DOCTYPE lolz [   <!ENTITY lol \"lol\">   <!ENTITY lol2 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">   <!ENTITY lol3 \"&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;\">   <!ENTITY lol4 \"&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;\">   <!ENTITY lol5 \"&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;\">   <!ENTITY lol6 \"&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;\">   <!ENTITY lol7 \"&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;\">   <!ENTITY lol8 \"&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;\">   <!ENTITY lol9 \"&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;\"> ]> <lolz>&lol9;</lolz>"
     def static byte[] gzipCompressedContent = compressGzipContent(content)
     def static byte[] deflateCompressedContent = compressDeflateContent(content)
     def static byte[] falseZip = content.getBytes()
@@ -52,7 +54,7 @@ class CompressionHeaderTest extends ReposeValveTest {
     }
 
     def setupSpec() {
-        repose.applyConfigs("features/filters/compression")
+        repose.applyConfigs("features/filters/compression/translation")
         repose.start()
         deproxy = new Deproxy()
         deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
@@ -64,34 +66,22 @@ class CompressionHeaderTest extends ReposeValveTest {
     }
 
     @Unroll("encoding: #encoding")
-    def "when a decompressed request is sent to Repose, accept-encoding header is removed after compression"() {
-        given:
-        def decompressedHandler = {request -> return new Response(200, "OK", ['content-encoding': encoding], unzippedContent.trim())}
+    def "when translating request"() {
 
-        when: "the decompressed content is sent to the origin service through Repose with encoding " + encoding
-        MessageChain mc = deproxy.makeRequest([url: reposeEndpoint, headers: ['accept-encoding': encoding], defaultHandler: decompressedHandler])
+        when: "User sends requests through repose"
+        def resp = deproxy.makeRequest(
+                (String) reposeEndpoint, "GET",
+                ['content-type': 'application/xml', 'accept': 'application/xml'],
+                reqBody)
 
-
-        then: "the compressed content should be compressed and the accept-encoding header should be absent"
-        mc.handlings.size == 1
-        mc.receivedResponse.headers.contains("Content-Encoding")
-        !mc.receivedResponse.headers.contains("Accept-Encoding")
-        if(!encoding.equals("identity")) {
-            def receivedResponse =  mc.receivedResponse.body
-            byte[] paddedZippedContent = [*extra_bytes[0..<0], *zippedContent, *extra_bytes[0..<extra_bytes.size()]]
-            assert(mc.handlings[0].response.body != mc.receivedResponse.body)
-            assert(mc.receivedResponse.body == paddedZippedContent)
-        } else {
-            assert(mc.handlings[0].response.body == mc.receivedResponse.body)
-            assert(mc.receivedResponse.body.toString().trim().equals(zippedContent.trim()))
-        }
+        then: "Response code should contain"
+        resp.receivedResponse.code == "400"
 
         where:
-        encoding    | unzippedContent | zippedContent             | extra_bytes
-        "gzip"      | content         | gzipCompressedContent     | [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-        "x-gzip"    | content         | gzipCompressedContent     | [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-        "deflate"   | content         | deflateCompressedContent  | [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-        "identity"  | content         | content                   | ""
+        reqBody << [
+            xmlResponseWithXmlBomb,
+            xmlResponseWithExtEntities
+        ]
 
     }
 

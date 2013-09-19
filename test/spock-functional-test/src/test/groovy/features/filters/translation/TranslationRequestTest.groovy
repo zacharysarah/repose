@@ -27,9 +27,15 @@ class TranslationRequestTest extends ReposeValveTest {
     def static Map contentOther = ["content-type": "application/other"]
     def static Map contentRss = ["content-type": "application/rss+xml"]
 
-    def static String xmlJSON = ["<json:string name=\"field1\">value1</json:string>", "<json:string name=\"field2\">value2</json:string>"]
+    def static ArrayList<String> xmlJSON = ["<json:string name=\"field1\">value1</json:string>", "<json:string name=\"field2\">value2</json:string>"]
     def static String remove = "remove-me"
     def static String add = "add-me"
+
+
+    def String convertStreamToString(byte[] input){
+        return new Scanner(new ByteArrayInputStream(input)).useDelimiter("\\A").next();
+    }
+
 
     //Start repose once for this particular translation test
     def setupSpec() {
@@ -55,15 +61,15 @@ class TranslationRequestTest extends ReposeValveTest {
         repose.stop()
     }
 
-    @Unroll("response: #respHeaders, request: #reqHeaders - #reqBody")
+    @Unroll("response: xml, request: #reqHeaders - #reqBody")
     def "when translating requests"() {
 
         given: "Repose is configured to translate requests"
-        def xmlResp = { request -> return new Response(200, "OK", respHeaders) }
+        def xmlResp = { request -> return new Response(200, "OK", contentXML) }
 
 
         when: "User passes a request through repose"
-        def resp = deproxy.makeRequest((String) reposeEndpoint + requestUri, method, reqHeaders, reqBody, xmlResp)
+        def resp = deproxy.makeRequest((String) reposeEndpoint, method, reqHeaders, reqBody, xmlResp)
         def sentRequest = ((MessageChain) resp).handlings[0]
 
         then: "Request body sent from repose to the origin service should contain"
@@ -72,7 +78,10 @@ class TranslationRequestTest extends ReposeValveTest {
 
         if(responseCode != "400"){
             for (String st : shouldContain) {
-                sentRequest.request.body.contains(st)
+                if(sentRequest.request.body instanceof byte[])
+                    assert(convertStreamToString(sentRequest.request.body).contains(st))
+                else
+                    assert(sentRequest.request.body.contains(st))
             }
         }
 
@@ -81,20 +90,23 @@ class TranslationRequestTest extends ReposeValveTest {
 
         if(responseCode != "400"){
             for (String st : shouldNotContain) {
-                !sentRequest.request.body.contains(st)
+                if(sentRequest.request.body instanceof byte[])
+                    assert(!convertStreamToString(sentRequest.request.body).contains(st))
+                else
+                    assert(!sentRequest.request.body.contains(st))
             }
         }
 
         where:
-        reqHeaders                 | respHeaders | reqBody                   | shouldContain  | shouldNotContain | method | requestUri                          | responseCode
-        acceptXML + contentXML     | contentXML  | xmlPayLoad                | ["somebody"]   | [remove]         | "POST" | ''                                  | '200'
-        acceptXML + contentXML     | contentXML  | xmlPayloadWithEntities    | ["\"somebody"] | [remove]         | "POST" | ''                                  | '200'
-        acceptXML + contentXML     | contentXML  | xmlPayloadWithXmlBomb     | ["\"somebody"] | [remove]         | "POST" | ''                                  | '400'
-        acceptXML + contentXMLHTML | contentXML  | xmlPayLoad                | [add]          | []               | "POST" | ''                                  | '200'
-        acceptXML + contentXMLHTML | contentXML  | xmlPayLoad                | [xmlPayLoad]   | [add]            | "PUT"  | ''                                  | '200'
-        acceptXML + contentJSON    | contentXML  | jsonPayload               | [add, xmlJSON] | []               | "POST" | ''                                  | '200'
-        acceptXML + contentOther   | contentXML  | jsonPayload               | [jsonPayload]  | [add]            | "POST" | ''                                  | '200'
-        acceptXML + contentXML     | contentXML  | xmlPayloadWithExtEntities | ["\"somebody"] | [remove]         | "POST" | ''                                       | "200"
+        reqHeaders                 | reqBody                   | shouldContain  | shouldNotContain | method | responseCode
+        acceptXML + contentXML     | xmlPayLoad                | ["somebody"]   | [remove]         | "POST" | '200'
+        acceptXML + contentXML     | xmlPayloadWithEntities    | ["\"somebody"] | [remove]         | "POST" | '200'
+        acceptXML + contentXML     | xmlPayloadWithXmlBomb     | ["\"somebody"] | [remove]         | "POST" | '400'
+        acceptXML + contentXMLHTML | xmlPayLoad                | [add]          | []               | "POST" | '200'
+        acceptXML + contentXMLHTML | xmlPayLoad                | [xmlPayLoad]   | [add]            | "PUT"  | '200'
+        acceptXML + contentJSON    | jsonPayload               | [add]+ xmlJSON | []               | "POST" | '200'
+        acceptXML + contentOther   | jsonPayload               | [jsonPayload]  | [add]            | "POST" | '200'
+        acceptXML + contentXML     | xmlPayloadWithExtEntities | ["\"somebody"] | [remove]         | "POST" | "200"
 
 
     }

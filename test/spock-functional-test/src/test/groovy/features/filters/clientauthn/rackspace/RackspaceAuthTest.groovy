@@ -38,57 +38,82 @@ class RackspaceAuthTest extends ReposeValveTest {
     }
 
     @Unroll("User: #user, Token: #token")
-    def "when authenticating user with Rackspace identity"() {
+    def "when authenticating user with Rackspace identity - success"() {
+
+        fakeIdentityService.client_token = token
+        fakeIdentityService.isTokenAuthenticated = true
+        fakeIdentityService.isAbleToGetGroups = true
+
+        when: "User passes a request through repose"
+        MessageChain mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+
+        then: "Request body sent from repose to the origin service should contain"
+        mc.receivedResponse.code == "200"
+        mc.handlings.size() == 1
+        mc.orphanedHandlings.size() == 2
+        mc.handlings[0].endpoint == originEndpoint
+        def request2 = mc.handlings[0].request
+        request2.headers.getFirstValue("X-auth-user") == user
+        request2.headers.getFirstValue("host") == "localhost:10001"
+        request2.headers.getFirstValue("x-forwarded-for") == "127.0.0.1"
+        request2.headers.getFirstValue("x-auth-token") == token
+        request2.headers.contains("x-pp-groups")
+        request2.headers.getFirstValue("x-authorization") == "Proxy " + user
+
+        when: "User passes a request through repose the second time"
+        mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+
+        then: "Request body sent from repose to the origin service should contain"
+        mc.receivedResponse.code == "200"
+        mc.orphanedHandlings.size() == 0
+        mc.handlings.size() == 1
+        mc.handlings[0].endpoint == originEndpoint
+        mc.handlings[0].request.headers.getFirstValue("X-auth-user") == user
+        mc.handlings[0].request.headers.getFirstValue("host") == "localhost:10001"
+        mc.handlings[0].request.headers.getFirstValue("x-forwarded-for") == "127.0.0.1"
+        mc.handlings[0].request.headers.getFirstValue("x-auth-token") == token
+        mc.handlings[0].request.headers.contains("x-pp-groups")
+        mc.handlings[0].request.headers.getFirstValue("x-authorization") == "Proxy " + user
+
+        where:
+        user     | token    | contentType
+        "rando5" | "toke4"  | "xml"
+        "rando9" | "toke8"  | "json"
+    }
+
+    @Unroll("User: #user, Token: #token")
+    def "when authenticating user with Rackspace identity - failure"() {
 
         fakeIdentityService.client_token = token
         fakeIdentityService.isTokenAuthenticated = isUserAuthed
-        fakeIdentityService.isAbleToGetGroups = groupsRetrieved
+        fakeIdentityService.isAbleToGetGroups = true
 
         when: "User passes a request through repose"
-        MessageChain mc = deproxy.makeRequest(reposeEndpoint + request + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+        MessageChain mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
 
         then: "Request body sent from repose to the origin service should contain"
         mc.receivedResponse.code == responseCode
-        mc.handlings.size() == handlings
-        mc.orphanedHandlings.size() == orphanedHandlings
-        if (mc.handlings.size() > 0) {
-            mc.handlings[0].endpoint == originEndpoint
-            def request2 = mc.handlings[0].request
-            request2.headers.contains("X-Default-Region")
-            request2.headers.getFirstValue("X-Default-Region") == "the-default-region"
-            request2.headers.contains("x-auth-token")
-            request2.headers.contains("x-identity-status")
-            request2.headers.contains("x-authorization")
-            request2.headers.getFirstValue("authorization") == "Authorization: Basic YWRtaW5fdXNlcm5hbWU6YWRtaW5fcGFzc3dvcmQ="
-            request2.headers.getFirstValue("x-identity-status") == "Confirmed"
-            request2.headers.getFirstValue("x-authorization") == "Proxy"
-        }
+        mc.handlings.size() == 0
+        mc.orphanedHandlings.size() == 1
 
         when: "User passes a request through repose the second time"
-        mc = deproxy.makeRequest(reposeEndpoint + request + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
+        mc = deproxy.makeRequest(reposeEndpoint + "/v1/" + user, 'GET', ['content-type': 'application/' + contentType, 'X-Auth-User': user, 'X-Auth-Token': token])
 
         then: "Request body sent from repose to the origin service should contain"
         mc.receivedResponse.code == responseCode
-        mc.orphanedHandlings.size() == cachedOrphanedHandlings
-        mc.handlings.size() == cachedHandlings
-        if (mc.handlings.size() > 0) {
-            mc.handlings[0].endpoint == originEndpoint
-            mc.handlings[0].request.headers.contains("X-Default-Region")
-            mc.handlings[0].request.headers.getFirstValue("X-Default-Region") == "the-default-region"
-        }
+        mc.orphanedHandlings.size() == 1
+        mc.handlings.size() == 0
 
         where:
-         request                 | user     | token    | isUserAuthed | responseCode | handlings | orphanedHandlings | cachedOrphanedHandlings | cachedHandlings | contentType | groupsRetrieved
-/* fail belongsto */     "/v1/"  | "rando2" | "toke1"  | false        | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
-/* empty user & token */ "/v1/"  | null     | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
-/* empty token */        "/v1/"  | "rando4" | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
-/* empty user  */        "/v1/"  | null     | "toke3"  | true         | "401"        | 0         | 1                 | 1                       | 0               | "xml"       | true
-/* success     */        "/v1/"  | "rando5" | "toke4"  | true         | "200"        | 1         | 2                 | 0                       | 1               | "xml"       | true
-/* fail belongsto */     "/v1/"  | "rando6" | "toke5"  | false        | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
-/* empty user & token */ "/v1/"  | null     | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
-/* empty token */        "/v1/"  | "rando8" | null     | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
-/* empty user  */        "/v1/"  | null     | "toke7"  | true         | "401"        | 0         | 1                 | 1                       | 0               | "json"      | true
-/* success     */        "/v1/"  | "rando9" | "toke8"  | true         | "200"        | 1         | 2                 | 0                       | 1               | "json"      | true
+                         user     | token    | isUserAuthed | responseCode | contentType
+/* fail belongsto */     "rando2" | "toke1"  | false        | "401"        | "xml"
+/* empty user & token */ null     | null     | true         | "401"        | "xml"
+/* empty token */        "rando4" | null     | true         | "401"        | "xml"
+/* empty user  */        null     | "toke3"  | true         | "401"        | "xml"
+/* fail belongsto */     "rando6" | "toke5"  | false        | "401"        | "json"
+/* empty user & token */ null     | null     | true         | "401"        | "json"
+/* empty token */        "rando8" | null     | true         | "401"        | "json"
+/* empty user  */        null     | "toke7"  | true         | "401"        | "json"
     }
 
     @Category(Bug)

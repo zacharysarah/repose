@@ -3,14 +3,14 @@ package features.filters.headerNormalization
 import framework.ReposeConfigurationProvider
 import framework.ReposeLogSearch
 import framework.ReposeValveLauncher
+import framework.ReposeValveTest
 import framework.category.Slow
 import org.junit.experimental.categories.Category
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.PortFinder
 import spock.lang.Specification
 
-@Category(Slow.class)
-class HeaderNormalizationJMXTest extends Specification {
+class HeaderNormalizationJMXTest extends ReposeValveTest {
 
     String PREFIX = "\"repose-config-test-com.rackspace.papi.filters\":type=\"HeaderNormalization\",scope=\"header-normalization\""
 
@@ -26,126 +26,74 @@ class HeaderNormalizationJMXTest extends Specification {
     String HEADER_NORMALIZATION_TERTIARY_PATH_GET = "${PREFIX},name=\"/tertiary/path/(.\\*)_GET\""
     String HEADER_NORMALIZATION_ACROSS_ALL = "${PREFIX},name=\"ACROSS ALL\""
 
-    int reposePort
-    int reposeStopPort
-    int originServicePort
-    String urlBase
 
-    Deproxy deproxy
-
-    Properties properties
-    def logFile
-    ReposeConfigurationProvider reposeConfigProvider
-    ReposeValveLauncher repose
-    ReposeLogSearch reposeLogSearch
-
-    def setup() {
-
-        // get ports
-        PortFinder pf = new PortFinder()
-
-        reposePort = pf.getNextOpenPort()
-        reposeStopPort = pf.getNextOpenPort()
-        originServicePort = pf.getNextOpenPort()
-
-        // start deproxy
-        deproxy = new Deproxy()
-        deproxy.addEndpoint(originServicePort)
-
-
-        // configure and start repose
-        properties = new Properties()
-        properties.load(ClassLoader.getSystemResource("test.properties").openStream())
-
-        def targetHostname = properties.getProperty("target.hostname")
-        urlBase = "http://${targetHostname}:${reposePort}"
-        logFile = properties.getProperty("repose.log")
-
-        def configDirectory = properties.getProperty("repose.config.directory")
-        def configSamples = properties.getProperty("repose.config.samples")
-        reposeConfigProvider = new ReposeConfigurationProvider(configDirectory, configSamples)
-
-        repose = new ReposeValveLauncher(
-                reposeConfigProvider,
-                properties.getProperty("repose.jar"),
-                urlBase,
-                configDirectory,
-                reposePort,
-                reposeStopPort
-        )
-        repose.enableDebug()
-        reposeLogSearch = new ReposeLogSearch(logFile);
-
-        reposeConfigProvider.applyConfigsRuntime(
-                "common",
-                [   'reposePort': reposePort.toString(),
-                    'targetPort': originServicePort.toString()])
-
+    def cleanup() {
+        deproxy.shutdown()
+        repose.stop()
     }
 
     def "when a client makes requests, jmx should keep accurate count"() {
-
         given:
-        reposeConfigProvider.applyConfigsRuntime(
-                "features/filters/headerNormalization/metrics/single",
-                [   'reposePort': reposePort.toString(),
-                    'targetPort': originServicePort.toString()])
+        repose.applyConfigs(
+                "features/filters/headerNormalization/metrics/single"
+        )
         repose.start()
-        // wait for repose to start
-        sleep(15000)
 
+        // start deproxy
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
 
         when:
-        def mc = deproxy.makeRequest(url: urlBase, method: "GET")
+        def mc = deproxy.makeRequest(url: reposeEndpoint, method: "GET")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_GET, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 1
 
         when:
-        mc = deproxy.makeRequest(url: urlBase, method: "POST")
+        mc = deproxy.makeRequest(url: reposeEndpoint, method: "POST")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_POST, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 2
 
         when:
-        mc = deproxy.makeRequest(url: urlBase, method: "PUT")
+        mc = deproxy.makeRequest(url: reposeEndpoint, method: "PUT")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_PUT, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 3
 
         when:
-        mc = deproxy.makeRequest(url: "${urlBase}/resource/1243/", method: "POST")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/resource/1243/", method: "POST")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_RESOURCE_POST, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 4
 
         when:
-        mc = deproxy.makeRequest(url: "${urlBase}/resource/1243/", method: "PUT")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/resource/1243/", method: "PUT")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_RESOURCE_PUT, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 5
 
         when:
-        mc = deproxy.makeRequest(url: "${urlBase}/servers/1243/", method: "GET")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/servers/1243/", method: "GET")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_SERVERS_GET, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 6
 
         when:
-        mc = deproxy.makeRequest(url: "${urlBase}/servers/1243/", method: "POST")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/servers/1243/", method: "POST")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_SERVERS_POST, "Count") == 1
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 7
 
         when:
-        mc = deproxy.makeRequest(url: "${urlBase}/servers/1243/", method: "PUT")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/servers/1243/", method: "PUT")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_SERVERS_PUT, "Count") == 1
@@ -156,16 +104,17 @@ class HeaderNormalizationJMXTest extends Specification {
     def "when multiple filter instances are configured, each should add to the count"() {
 
         given:
-        reposeConfigProvider.applyConfigsRuntime(
-                "features/filters/headerNormalization/metrics/multiple",
-                [   'reposePort': reposePort.toString(),
-                    'targetPort': originServicePort.toString()])
+        repose.applyConfigs(
+                "features/filters/headerNormalization/metrics/multiple"
+        )
         repose.start()
-        // wait for repose to start
-        sleep(15000)
+
+        // start deproxy
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
 
         when: "client makes a request that matches one filter's uri-regex attribute"
-        def mc = deproxy.makeRequest(url: urlBase)
+        def mc = deproxy.makeRequest(url: reposeEndpoint)
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_GET, "Count") == 1
@@ -174,7 +123,7 @@ class HeaderNormalizationJMXTest extends Specification {
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ACROSS_ALL, "Count") == 1
 
         when: "client makes a request that matches two filters' uri-regex attributes"
-        mc = deproxy.makeRequest(url: "${urlBase}/secondary/path/asdf")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/secondary/path/asdf")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_GET, "Count") == 2
@@ -184,7 +133,7 @@ class HeaderNormalizationJMXTest extends Specification {
 
 
         when: "client makes a request that matches two filters' uri-regex attributes"
-        mc = deproxy.makeRequest(url: "${urlBase}/tertiary/path/asdf")
+        mc = deproxy.makeRequest(url: "${reposeEndpoint}/tertiary/path/asdf")
 
         then:
         repose.jmx.getMBeanAttribute(HEADER_NORMALIZATION_ROOT_GET, "Count") == 2
@@ -194,9 +143,5 @@ class HeaderNormalizationJMXTest extends Specification {
 
     }
 
-    def cleanup() {
-        repose.stop()
-        deproxy.shutdown()
-    }
 
 }

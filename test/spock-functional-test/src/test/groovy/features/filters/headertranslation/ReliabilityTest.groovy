@@ -8,8 +8,10 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.Request
 import org.rackspace.gdeproxy.Response
+import org.junit.experimental.categories.Category
+import framework.category.Benchmark
 
-
+@Category(Benchmark)
 class ReliabilityTest extends ReposeValveTest {
 
     //Start repose once for this particular translation test

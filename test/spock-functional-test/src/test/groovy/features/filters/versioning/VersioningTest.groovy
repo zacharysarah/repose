@@ -53,16 +53,16 @@ class VersioningTest extends ReposeValveTest {
         def mc = deproxy.makeRequest((String) reposeEndpoint, 'GET', reqHeaders)
 
         then: "Response body should contain"
-        mc.receivedResponse.code == respCode
+        mc.receivedResponse.code == "200"
 
         for (String st : shouldContain) {
             mc.receivedResponse.body.contains(st)
         }
 
         where:
-        reqHeaders | respCode | shouldContain
-        acceptXML  | '200'    | ['id="/v1"','id="/v2"']
-        acceptJSON | '200'    | ['"id" : "/v1"','"id" : "/v2"']
+        reqHeaders | shouldContain
+        acceptXML  | ['id="/v1"','id="/v2"']
+        acceptJSON | ['"id" : "/v1"','"id" : "/v2"']
 
 
     }
@@ -107,22 +107,22 @@ class VersioningTest extends ReposeValveTest {
         def mc = deproxy.makeRequest((String) reposeEndpoint + requestUri, 'GET', reqHeaders)
 
         then: "Response body should contain"
-        mc.receivedResponse.code == respCode
+        mc.receivedResponse.code == "200"
 
         mc.handlings.size() == 1
         mc.handlings[0].request.headers.getFirstValue("host") == host
 
         where:
-        reqHeaders            | respCode | requestUri         | host
-        acceptV2VendorJSON    | '200'    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port2").toInteger()
-        acceptV2VendorXML     | '200'    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port2").toInteger()
-        acceptHtml            | '200'    | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
-        acceptXHtml           | '200'    | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
-        acceptXMLWQ           | '200'    | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
-        acceptV1VendorJSON    | '200'    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port").toInteger()
-        acceptV1VendorXML     | '200'    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port").toInteger()
-        acceptXML             | '200'    | "/v1/usertest1/ss" | "localhost:" + properties.getProperty("target.port").toInteger()
-        acceptJSON            | '200'    | "/v1/usertest1/ss" | "localhost:" + properties.getProperty("target.port").toInteger()
+        reqHeaders            | requestUri         | host
+        acceptV2VendorJSON    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port2").toInteger()
+        acceptV2VendorXML     | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port2").toInteger()
+        acceptHtml            | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
+        acceptXHtml           | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
+        acceptXMLWQ           | "/v2/usertest1/ss" | "localhost:" + properties.getProperty("target.port2").toInteger()
+        acceptV1VendorJSON    | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port").toInteger()
+        acceptV1VendorXML     | "/usertest1/ss"    | "localhost:" + properties.getProperty("target.port").toInteger()
+        acceptXML             | "/v1/usertest1/ss" | "localhost:" + properties.getProperty("target.port").toInteger()
+        acceptJSON            | "/v1/usertest1/ss" | "localhost:" + properties.getProperty("target.port").toInteger()
 
 
     }

@@ -25,10 +25,15 @@ class TranslateResponseTest extends ReposeValveTest {
     def static Map contentXMLHTML = ["content-type": "application/xhtml+xml"]
     def static Map contentOther = ["content-type": "application/other"]
     def static Map acceptRss = ["accept": "application/rss+xml"]
-    def static String xmlJSON = ["<json:string name=\"field1\">value1</json:string>", "<json:string name=\"field2\">value2</json:string>"]
+    def static ArrayList<String> xmlJSON = ["<json:string name=\"field1\">value1</json:string>", "<json:string name=\"field2\">value2</json:string>"]
     def static String filterChainUnavailable = "filter list not available"
     def static String remove = "remove-me"
     def static String add = "add-me"
+
+
+    def String convertStreamToString(byte[] input){
+        return new Scanner(new ByteArrayInputStream(input)).useDelimiter("\\A").next();
+    }
 
     //Start repose once for this particular translation test
     def setupSpec() {
@@ -48,7 +53,7 @@ class TranslateResponseTest extends ReposeValveTest {
         repose.stop()
     }
 
-    @Unroll("request: #reqHeaders, response: #respHeaders - #respBody with request: #requestUri")
+    @Unroll("when translating responses - request: xml, response: #respHeaders - #respBody")
     def "when translating responses"() {
 
         given: "Origin service returns body of type " + respHeaders
@@ -56,30 +61,33 @@ class TranslateResponseTest extends ReposeValveTest {
 
 
         when: "User sends requests through repose"
-        def resp = deproxy.makeRequest((String) reposeEndpoint + requestUri, method, reqHeaders, "something", xmlResp)
+        def resp = deproxy.makeRequest((String) reposeEndpoint, method, acceptXML, "something", xmlResp)
 
         then: "Response body should contain"
         for (String st : shouldContain) {
-            resp.receivedResponse.body.contains(st)
+            if(resp.receivedResponse.body instanceof byte[])
+                assert(convertStreamToString(resp.receivedResponse.body).contains(st))
+            else
+                assert(resp.receivedResponse.body.contains(st))
         }
 
         and: "Response body should not contain"
         for (String st : shouldNotContain) {
-            !resp.receivedResponse.body.contains(st)
+            assert(!resp.receivedResponse.body.contains(st))
         }
 
         and: "Response code should be"
         resp.receivedResponse.code.equalsIgnoreCase(respCode.toString())
 
         where:
-        reqHeaders | respHeaders    | respBody                   | respCode | shouldContain  | shouldNotContain         | requestUri                          | method
-        acceptXML  | contentXML     | xmlResponse                | 200      | ["somebody"]   | [remove]                 | ""                                  | "PUT"
-        acceptXML  | contentXML     | xmlResponseWithEntities    | 200      | ["\"somebody"] | [remove]                 | ""                                  | "PUT"
-        acceptXML  | contentXML     | xmlResponseWithXmlBomb     | 500      | ["\"somebody"] | [remove]                 | ""                                  | "PUT"
-        acceptXML  | contentXMLHTML | xmlResponse                | 200      | [add]          | [filterChainUnavailable] | ""                                  | "PUT"
-        acceptXML  | contentJSON    | jsonResponse               | 200      | [xmlJSON, add] | [filterChainUnavailable] | ""                                  | "PUT"
-        acceptXML  | contentOther   | jsonResponse               | 200      | [jsonResponse] | [add]                    | ""                                  | "PUT"
-        acceptXML  | contentXML     | xmlResponseWithExtEntities | 200      | ["\"somebody"] | [remove]                 | ""                                  | "POST"
+        respHeaders    | respBody                   | respCode | shouldContain  | shouldNotContain         | method
+        contentXML     | xmlResponse                | 200      | ["somebody"]   | [remove]                 | "PUT"
+        contentXML     | xmlResponseWithEntities    | 200      | ["\"somebody"] | [remove]                 | "PUT"
+        contentXML     | xmlResponseWithXmlBomb     | 500      | []             | [remove]                 | "PUT"
+        contentXMLHTML | xmlResponse                | 200      | [add]          | [filterChainUnavailable] | "PUT"
+        contentJSON    | jsonResponse               | 200      | xmlJSON + [add]| [filterChainUnavailable] | "PUT"
+        contentOther   | jsonResponse               | 200      | [jsonResponse] | [add]                    | "PUT"
+        contentXML     | xmlResponseWithExtEntities | 200      | ["\"somebody"] | [remove]                 | "POST"
 
 
     }
