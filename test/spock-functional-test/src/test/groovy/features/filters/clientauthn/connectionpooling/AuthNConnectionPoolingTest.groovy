@@ -1,9 +1,11 @@
 package features.filters.clientauthn.connectionpooling
 
+import features.filters.clientauthn.IdentityServiceRemoveTenantedValidationResponseSimulator
 import features.filters.clientauthn.IdentityServiceResponseSimulator
 import framework.ReposeConfigurationProvider
 import framework.ReposeLogSearch
 import framework.ReposeValveLauncher
+import framework.ReposeValveTest
 import org.rackspace.gdeproxy.Deproxy
 import org.rackspace.gdeproxy.DeproxyEndpoint
 import org.rackspace.gdeproxy.Handling
@@ -15,88 +17,31 @@ import spock.lang.Specification
  * User: izrik
  *
  */
-class AuthNConnectionPoolingTest extends Specification {
+class AuthNConnectionPoolingTest extends ReposeValveTest {
 
-    int reposePort
-    int reposeStopPort
-    int originServicePort
-    int identityServicePort
-    String urlBase
+    def static originEndpoint
+    def static identityEndpoint
 
     IdentityServiceResponseSimulator identityService
 
-    Deproxy deproxy
-    DeproxyEndpoint originEndpoint
-    DeproxyEndpoint identityEndpoint
-
-    Properties properties
-    def logFile
-    ReposeConfigurationProvider reposeConfigProvider
-    ReposeValveLauncher repose
-    ReposeLogSearch reposeLogSearch
-
     def setup() {
 
-        // get ports
-        PortFinder pf = new PortFinder()
-
-        reposePort = pf.getNextOpenPort()
-        reposeStopPort = pf.getNextOpenPort()
-        originServicePort = pf.getNextOpenPort()
-        identityServicePort = pf.getNextOpenPort()
-
-        identityService = new IdentityServiceResponseSimulator(identityServicePort, originServicePort)
-
-        // start deproxy
-        deproxy = new Deproxy()
-        originEndpoint = deproxy.addEndpoint(originServicePort)
-        identityEndpoint = deproxy.addEndpoint(identityServicePort,
-                "identity", "localhost", identityService.handler)
-
-
-        // configure and start repose
-        properties = new Properties()
-        properties.load(ClassLoader.getSystemResource("test.properties").openStream())
-
-        def targetHostname = properties.getProperty("target.hostname")
-        urlBase = "http://${targetHostname}:${reposePort}"
-        logFile = properties.getProperty("repose.log")
-
-        def configDirectory = properties.getProperty("repose.config.directory")
-        def configSamples = properties.getProperty("repose.config.samples")
-        reposeConfigProvider = new ReposeConfigurationProvider(configDirectory, configSamples)
-
-        repose = new ReposeValveLauncher(
-                reposeConfigProvider,
-                properties.getProperty("repose.jar"),
-                urlBase,
-                configDirectory,
-                reposePort,
-                reposeStopPort
-        )
-        repose.enableDebug()
-        reposeLogSearch = new ReposeLogSearch(logFile);
-
-        def params = [
-            'reposePort': reposePort.toString(),
-            'repose_port': reposePort.toString(),
-            'targetPort': originServicePort.toString(),
-            'target_port': originServicePort.toString(),
-            'targetHostname': targetHostname.toString(),
-            'target_hostname': targetHostname.toString(),
-            'identityPort': identityServicePort.toString(),
-            'identity_port': identityServicePort.toString()
-        ]
-        reposeConfigProvider.applyConfigsRuntime("common", params)
-        reposeConfigProvider.applyConfigsRuntime("features/filters/clientauthn/connectionpooling", params)
-        reposeConfigProvider.applyConfigsRuntime("features/filters/clientauthn/connectionpooling2", params)
+        repose.applyConfigs("common",
+                "features/filters/clientauthn/connectionpooling",
+                "features/filters/clientauthn/connectionpooling2")
         repose.start()
+
+        deproxy = new Deproxy()
+        originEndpoint = deproxy.addEndpoint(properties.getProperty("target.port").toInteger(), 'origin service')
+        identityService = new IdentityServiceResponseSimulator()
+        identityEndpoint = deproxy.addEndpoint(properties.getProperty("identity.port").toInteger(),
+                'identity service', null, identityService.handler)
     }
 
     def "when a client makes requests, Repose should re-use the connection to the Identity service"() {
 
         setup: "craft an url to a resource that requires authentication"
-        def url = "${urlBase}/servers/tenantid/resource"
+        def url = "${reposeEndpoint}/servers/tenantid/resource"
 
 
         when: "making two authenticated requests to Repose"

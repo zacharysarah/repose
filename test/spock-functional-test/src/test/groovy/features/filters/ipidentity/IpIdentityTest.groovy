@@ -12,29 +12,11 @@ import spock.lang.Shared
 @Category(Slow.class)
 class IpIdentityTest extends ReposeValveTest {
 
-    @Shared
-    def url
     def setupSpec() {
-        PortFinder pf = new PortFinder()
-        int deproxyPort = pf.getNextOpenPort()
-        int reposePort = pf.getNextOpenPort()
-        deproxy = new Deproxy()
-        deproxy.addEndpoint(deproxyPort)
-
-        url = "http://localhost:${reposePort}"
-
-        repose.configurationProvider.cleanConfigDirectory()
-        repose.configurationProvider.applyConfigsRuntime(
-                "common",
-                ["reposePort": reposePort.toString(),
-                        "targetPort": deproxyPort.toString()]);
-        repose.configurationProvider.applyConfigsRuntime(
-                "features/filters/ipidentity",
-                ["reposePort": reposePort.toString(),
-                        "targetPort": deproxyPort.toString()]);
+        repose.applyConfigs("common","features/filters/ipidentity")
         repose.start()
-        repose.waitForNon500FromUrl(url)
-//        waitUntilReadyToServiceRequests()
+        deproxy = new Deproxy()
+        deproxy.addEndpoint(properties.getProperty("target.port").toInteger())
     }
 
     def cleanupSpec() {
