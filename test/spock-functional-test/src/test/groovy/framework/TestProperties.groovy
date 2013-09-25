@@ -11,13 +11,17 @@ class TestProperties {
 
     String reposeJar
     String glassfishJar
+    String reposeRootWar
 
     int reposePort
     int reposeShutdownPort
 
     // Property settings that aren't set for every test
     String targetPort
+    String targetPort2
     String identityPort
+    String atomPort
+    String targetHostname
 
     TestProperties(InputStream propertiesStream) {
 
@@ -37,7 +41,7 @@ class TestProperties {
             }
 
             reposeJar = properties.getProperty("repose.jar")
-
+            reposeRootWar = properties.getProperty("repose.root.war")
             reposePort = properties.getProperty("repose.port").toInteger()
             reposeShutdownPort = properties.getProperty("repose.shutdown.port").toInteger()
 
@@ -45,7 +49,10 @@ class TestProperties {
 
 
             targetPort = properties.getProperty("target.port")
+            targetPort2 = properties.getProperty("target.port2")
             identityPort = properties.getProperty("identity.port")
+            atomPort = properties.getProperty("atom.port")
+            targetHostname = properties.getProperty("target.hostname")
 
         } catch (Exception e) {
             throw new RuntimeException("Failure in setup of test: unable to read property files")
@@ -62,8 +69,13 @@ class TestProperties {
             case "target.port":
                 return targetPort
                 break
+            case "target.port2":
+                return targetPort2
+                break
             case "identity.port":
                 return identityPort
+            case "atom.port":
+                return atomPort
             default:
                 return null
         }
