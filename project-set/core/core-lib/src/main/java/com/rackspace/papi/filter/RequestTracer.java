@@ -10,7 +10,7 @@ public class RequestTracer {
     private long requestStart;
 
     public RequestTracer(boolean trace) {
-        this.trace = trace;
+        this.trace = true;
         requestStart = new Date().getTime();
     }
 
