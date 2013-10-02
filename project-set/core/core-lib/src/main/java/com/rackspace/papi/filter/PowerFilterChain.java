@@ -196,6 +196,7 @@ public class PowerFilterChain implements FilterChain {
             long delay = tracer.traceExit(mutableHttpResponse, filter.getFilterConfig().getName(), start);
             if (mbcFilterProcessingTime != null) {
                 mbcFilterProcessingTime.mark(filter.getName(), delay);
+                //mbcFilterProcessingTime.mark("test", 1000);
             }
         } else {
             long start = tracer.traceEnter();
