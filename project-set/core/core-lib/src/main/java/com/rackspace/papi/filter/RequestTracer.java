@@ -10,7 +10,7 @@ public class RequestTracer {
     private long requestStart;
 
     public RequestTracer(boolean trace) {
-        this.trace = trace;
+        this.trace = true;
         requestStart = new Date().getTime();
     }
 
@@ -22,13 +22,15 @@ public class RequestTracer {
         return new Date().getTime() - requestStart;
     }
 
-    public void traceExit(MutableHttpServletResponse response, String filterName, long myStart) {
+    public long traceExit(MutableHttpServletResponse response, String filterName, long myStart) {
         if (!trace) {
-            return;
+            return Long.MIN_VALUE;
         }
         long totalRequestTime = new Date().getTime() - requestStart;
         long myTime = totalRequestTime - myStart - accumulatedTime;
         accumulatedTime += myTime;
         response.addHeader("X-" + filterName + "-Time", myTime + "ms");
+
+        return myTime;
     }
 }
