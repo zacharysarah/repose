@@ -8,6 +8,8 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.InputStreamEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import java.util.Enumeration;
  */
 class HttpComponentRequestProcessor extends AbstractRequestProcessor {
 
+    private static final Logger LOG = LoggerFactory.getLogger(HttpComponentRequestProcessor.class);
     private static final String ENCODING = "UTF-8";
     private final HttpServletRequest sourceRequest;
     private final URI targetHost;
@@ -48,11 +51,16 @@ class HttpComponentRequestProcessor extends AbstractRequestProcessor {
             String[] values = sourceRequest.getParameterValues(name);
 
             for (String value : values) {
+                String paramValue = value;
                 try {
-                    builder.addParameter(name, URLDecoder.decode(value, ENCODING));
+                    paramValue = URLDecoder.decode(value, ENCODING);
+                } catch (IllegalArgumentException ex) {
+                    LOG.warn("Error decoding query parameter named: " + name + " value: " + paramValue, ex);
                 } catch (UnsupportedEncodingException ex) {
-                    throw new URISyntaxException(value, "Invalid value for query parameter: " + name);
+                    LOG.warn("Error decoding query parameter named: " + name + " value: " + paramValue, ex);
                 }
+
+                builder.addParameter(name, paramValue);
             }
         }
     }

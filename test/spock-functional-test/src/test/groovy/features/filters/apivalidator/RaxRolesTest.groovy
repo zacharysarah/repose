@@ -322,4 +322,11 @@ class RaxRolesTest extends ReposeValveTest {
         "PUT"    | "/a/b" | ["x-roles": "test_user11"]                      | "403"
         "PUT"    | "/a/b" | ["x-roles": "test_user11, observer"]            | "403"
     }
+
+    def "rax roles for autoscale"() {
+
+
+
+    }
+
 }
