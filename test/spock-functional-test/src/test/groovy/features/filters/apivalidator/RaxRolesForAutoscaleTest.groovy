@@ -28,7 +28,7 @@ class RaxRolesForAutoscaleTest extends ReposeValveTest {
             deproxy.shutdown()
     }
 
-    @Unroll("raxRolesDisabled:method=#method,headers=#headers,expected response=#responseCode")
+    @Unroll("#method with x-roles=#headers,expected response=#responseCode")
     def "when enable-rax-role is true, user authorized to access the entire wadl"() {
         given:
         MessageChain messageChain
