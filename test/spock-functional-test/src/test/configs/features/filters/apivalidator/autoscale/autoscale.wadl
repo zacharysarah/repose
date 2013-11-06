@@ -2,7 +2,7 @@
 <application xmlns="http://wadl.dev.java.net/2009/02"
              xmlns:wadl="http://wadl.dev.java.net/2009/02"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:rax="http://docs.rackspace.com/api"
+             xmlns:rax="http://docs.rackspace.com/api">
     <resources base="https://{region}.autoscale.api.rackspacecloud.com/">
       <resource path="v1.0" rax:roles="admin autoscale:admin autoscale:service-admin"
                 id="version">
@@ -387,7 +387,6 @@
       </request>
       <response status="201">
          <param name="location" style="header" required="true" type="xsd:anyURI">
-            <doc>This operation creates an autoscaling endpoint</doc>
          </param>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
@@ -395,14 +394,6 @@
       </response>
    </method>
    <method id="getGroups" name="GET" rax:roles="observer autoscale:observer">
-      <wadl:doc xmlns="http://docbook.org/ns/docbook" title="List Scaling Groups" xml:lang="EN">
-         <para role="shortdesc">
-                This operation lists the autoscaling groups that are available for the specified tenant.
-            </para>
-         <para>
-                This operation returns a list of autoscaling groups that have been created for the tenant specified by
-                <code>tenantID</code>.</para>
-      </wadl:doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
@@ -410,15 +401,6 @@
       </response>
    </method>
    <method id="getGroupManifest" name="GET" rax:roles="observer autoscale:observer">
-      <wadl:doc xmlns="http://docbook.org/ns/docbook" title="List All Group Details">
-         <para role="shortdesc">
-                This operation returns details about the configuration for a specified autoscaling group.
-            </para>
-         <para>
-                This operation returns details including the launch configuration and the scaling policies for the specified autoscaling group configuration. These
-                details are returned in the response body in JSON format.
-            </para>
-      </wadl:doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
@@ -448,12 +430,7 @@
       <response status="204"/>
    </method>
    <method id="getLaunchConfig" name="GET" rax:roles="observer autoscale:observer">
-      <doc title="Get Launch Configuration">
-      <response status="200">
-         <representation mediaType="application/json">
-            <doc xml:lang="en"/>
-         </representation>
-      </response>
+     
    </method>
    <method id="putLaunchConfig" name="PUT">
       <request>
@@ -480,17 +457,8 @@
       <response status="204"/>
    </method>
    <method name="GET" id="getPolicies" rax:roles="observer autoscale:observer">
-      <response status="200">
-         <representation mediaType="application/json">
-            <doc xml:lang="en"/>
-         </representation>
-      </response>
    </method>
    <method name="POST" id="createPolicies">
-      <request>
-      </request>
-      <response status="201">
-      </response>
    </method>
    <method name="GET" id="getPolicy" rax:roles="observer autoscale:observer">
       <response status="200">
