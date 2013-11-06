@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns="http://wadl.dev.java.net/2009/02"
-             xmlns:identity="http://docs.openstack.org/identity/api/v2.0"
-             xmlns:db="http://docbook.org/ns/docbook"
-             xmlns:raxapi="http://docs.rackspace.com/volume/api/v1"
              xmlns:wadl="http://wadl.dev.java.net/2009/02"
-             xmlns:osapi="http://docs.openstack.org/compute/api/v1.1"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
              xmlns:rax="http://docs.rackspace.com/api"
-             xmlns:xsdxt="http://docs.rackspacecloud.com/xsd-ext/v1.0">
     <resources base="https://{region}.autoscale.api.rackspacecloud.com/">
       <resource path="v1.0" rax:roles="admin autoscale:admin autoscale:service-admin"
                 id="version">
@@ -89,108 +84,22 @@
                   </resource>
                   <resource path="resume" id="resume">
                      <method name="POST" rax:id="resumeGroup">
-                        <doc title="Resume Group Policy Execution">
-                           <db:para role="shortdesc">
-                This operation resumes the execution of an autoscaling policy.
-            </db:para>
-                           <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation resumes the execution of all autoscaling policies for the specified autoscaling group.
-            </p>
-                        </doc>
+
                         <request>
                            <representation mediaType="application/json">
                               <doc xml:lang="en"/>
                            </representation>
                         </request>
                         <response status="204"/>
-                        <response>
-                           <representation mediaType="application/xml" element="identity:identityFault"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="400">
-                           <representation mediaType="application/xml" element="identity:badRequest"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="401">
-                           <representation mediaType="application/xml" element="identity:unauthorized"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="403">
-                           <representation mediaType="application/xml" element="identity:forbidden"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="405">
-                           <representation mediaType="application/xml" element="identity:badMethod"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="413">
-                           <representation mediaType="application/xml" element="identity:overLimit"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="503">
-                           <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="404">
-                           <representation mediaType="application/xml" element="identity:itemNotFound"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="415">
-                           <representation mediaType="application/xml" element="identity:badMediaType"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                     </method>
+                        </method>
                   </resource>
                   <resource path="state" id="group_state">
                      <method name="GET" rax:roles="observer autoscale:observer" rax:id="getGroupState">
-                        <doc title="Get Group State">
-                           <db:para role="shortdesc">
-               This operation returns the state of an autoscaling group.
-            </db:para>
-                           <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation retrieves the current state of the specified autoscaling group.
-                It describes the state of the group in terms of its
-                current set of active entities, the number of pending entities, and
-                the desired number of entities. The description is returned in the response body
-                in JSON format.
-            </p>
-                        </doc>
+
                         <response status="200">
                            <representation mediaType="application/json">
                               <doc xml:lang="en"/>
                            </representation>
-                        </response>
-                        <response>
-                           <representation mediaType="application/xml" element="identity:identityFault"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="400">
-                           <representation mediaType="application/xml" element="identity:badRequest"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="401">
-                           <representation mediaType="application/xml" element="identity:unauthorized"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="403">
-                           <representation mediaType="application/xml" element="identity:forbidden"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="405">
-                           <representation mediaType="application/xml" element="identity:badMethod"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="413">
-                           <representation mediaType="application/xml" element="identity:overLimit"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="503">
-                           <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-                           <representation mediaType="application/json"/>
-                        </response>
-                        <response status="404">
-                           <representation mediaType="application/xml" element="identity:itemNotFound"/>
-                           <representation mediaType="application/json"/>
                         </response>
                      </method>
                   </resource>
@@ -484,42 +393,6 @@
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="getGroups" name="GET" rax:roles="observer autoscale:observer">
       <wadl:doc xmlns="http://docbook.org/ns/docbook" title="List Scaling Groups" xml:lang="EN">
@@ -534,38 +407,6 @@
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method id="getGroupManifest" name="GET" rax:roles="observer autoscale:observer">
@@ -583,887 +424,108 @@
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-   </method>
-   <method id="deleteGroup" name="DELETE">
-      <doc title="Delete Group">
-         <db:para role="shortdesc">
-                This operation deletes an autoscaling group.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation deletes the specified autoscaling group if the group is empty.
-                An empty group contains no entities. If deletion is successful, no response body is returned. If
-                the group contains pending or active entities, deletion fails and a 409 error message is returned. Pass force=true to force
-                delete the group, ignoring pending/active entities.
-            </p>
-      </doc>
-      <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="getGroupState" name="GET" rax:roles="observer autoscale:observer">
-      <doc title="Get Group State">
-         <db:para role="shortdesc">
-               This operation returns the state of an autoscaling group.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation retrieves the current state of the specified autoscaling group.
-                It describes the state of the group in terms of its
-                current set of active entities, the number of pending entities, and
-                the desired number of entities. The description is returned in the response body
-                in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method id="getGroupConfig" name="GET" rax:roles="observer autoscale:observer">
-      <doc title="Get Group Configuration">
-         <db:para role="shortdesc">
-               This operation lists the configuration for an autoscaling group.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation lists the configuration for a specified autoscaling group.
-                The configuration describes the
-                minimum number of entities in the group,
-                the maximum number of entities in the group,
-                the global
-                cooldown time for the group, and other metadata. The configuration is returned in the response body in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method id="putGroupConfig" name="PUT">
-      <doc title="Replace Group Configuration">
-         <db:para role="shortdesc">
-                This operation updates the configuration for the autoscaling group.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation changes the configuration of an existing autoscaling group.
-            To change the configuration,
-            specify the new configuration in the request body in JSON format.
-            Configuration elements include
-            the
-            minimum number of entities, the maximum number of entities, the global
-            cooldown time, and other metadata. If the update is successful, no response body is
-            returned.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="getLaunchConfig" name="GET" rax:roles="observer autoscale:observer">
       <doc title="Get Launch Configuration">
-         <db:para role="shortdesc">
-                This operation lists the launch configuration.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation lists the launch configuration for the specified autoscaling group.
-                The launch configuration describes the details of how to create a server,
-                from what image to create a server,
-                which load
-                balancers to join the server to, which networks to add the server to, and other
-                metadata. The launch configuration is returned in the response body in JSON
-                format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method id="putLaunchConfig" name="PUT">
-      <doc title="Replace Launch Configuration">
-         <db:para role="shortdesc">
-                This operation updates the launch group configuration.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation changes an existing launch configuration for the specified autoscaling group.
-                To change the launch configuration,
-                specify the new configuration in the request body in JSON format.
-                Configuration elements include
-                how to create a server,
-                from what image to create a server,
-                which load
-                balancers to join the server to, which networks to add the server to, and other
-                metadata. If the update is successful, no response body is returned.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="pauseGroup" name="POST">
-      <doc title="Pause Group Policy Execution">
-         <db:para role="shortdesc">
-                This operation pauses the execution of a scaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation pauses the execution of all autoscaling policies for the specified autoscaling group.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="resumeGroup" name="POST">
-      <doc title="Resume Group Policy Execution">
-         <db:para role="shortdesc">
-                This operation resumes the execution of an autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation resumes the execution of all autoscaling policies for the specified autoscaling group.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method name="GET" id="getPolicies" rax:roles="observer autoscale:observer">
-      <doc title="Get Policies List">
-         <db:para role="shortdesc">
-                This operation lists scaling policies in the autoscaling group.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation returns a list of the scaling policies that are available to the specified autoscaling group.
-            Each policy is described in terms of an ID,
-            name, type, adjustment, cooldown time, and links. These
-            descriptions are returned in the response body in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method name="POST" id="createPolicies">
-      <doc title="Create Policy">
-         <db:para role="shortdesc">
-                This operation creates an autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation creates one or multiple autoscaling policies for the specified autoscaling group.
-            To create a policy, specify it in the request body in JSON format.
-            Each description must include a name, type, adjustment, and cooldown time.
-            </p>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            Use the JSON response to obtain information about the newly-created policy or policies:
-            <ul>
-               <li>The response header points to the List Policies endpoint.</li>
-               <li>The response body provides an array of scaling policies.</li>
-            </ul>
-         </p>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            The examples below demonstrate several methods of creating autoscaling policies:
-            <ul>
-               <li>a request to create a policy based on desired capacity</li>
-               <li>a request to create a policy based on incremental change</li>
-               <li>a request to create a policy based on change percentage</li>
-               <li>a request to create a policy based on change percentage scheduled daily, at a specific time of day</li>
-               <li>a request to create a policy based on change percentage scheduled once, for a specific date and time</li>
-               <li>a request to create a policy based on change percentage in response to an alarm</li>
-               <li>a request to create multiple policies, followed by the matching response</li>
-            </ul>
-         </p>
-      </doc>
       <request>
-         <representation mediaType="application/json">
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Desired Capacity) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Incremental Change) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Percentage Change) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Percentage Change at Time) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Percentage Change on Date) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policy (Percentage Change on Alarm) Request: JSON"/>
-            </doc>
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policies Request: JSON"/>
-            </doc>
-         </representation>
       </request>
       <response status="201">
-         <representation mediaType="application/json">
-            <doc xml:lang="en">
-               <xsdxt:sample title="Create Policies Response: JSON"/>
-            </doc>
-         </representation>
-      </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
       </response>
    </method>
    <method name="GET" id="getPolicy" rax:roles="observer autoscale:observer">
-      <doc title="Get Policy Details">
-         <db:para role="shortdesc">
-                This operation returns details for a specified autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation returns a description for the specified autoscaling policy.
-            The description includes an ID, name, type,
-            adjustment, cooldown time, and links. The description is returned in the
-            response body in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="putPolicy" name="PUT">
-      <doc title="Replace Policy">
-         <db:para role="shortdesc">
-                This operation updates an autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation modifies an existing autoscaling policy for the specified tenant.
-            To update the policy, specify the policy's name,
-            type, adjustment, and cooldown time in the request body in JSON format. If the change is successful, no response body
-            is returned.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="deletePolicy" name="DELETE">
-      <doc title="Delete Policy">
-         <db:para role="shortdesc">
-                This operation deletes an autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation deletes the specified autoscaling policy from the specified tenant.
-                If deletion is successful, no response body is returned.
-            </p>
-      </doc>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="executePolicy" name="POST">
-      <doc title="Execute Policy">
-         <db:para role="shortdesc">
-                This operation executes an autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation executes the specified autoscaling policy. If execution is successful, a response body is
-            returned.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="202"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method name="GET" id="getWebhooks">
-      <doc title="Get a list of webhooks for the policy">
-         <db:para role="shortdesc">
-                This operation obtains a list of webhooks for the autoscaling policy.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation obtains a list of webhooks and their IDs for the specified autoscaling policy. This data is returned in
-                the response body in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="createWebhook" name="POST">
-      <doc title="Create a webhook">
-         <db:para role="shortdesc">
-                This operation creates a webhook.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation creates one or more webhooks for the specified autoscaling policy. Webhooks must
-            have a name. If successful, the response body will contain
-            the IDs and links to the newly created webhooks. This data is provided
-            in the request body in JSON format.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
@@ -1474,243 +536,31 @@
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="getWebhook" name="GET">
-      <doc title="View Webhook">
-         <db:para role="shortdesc">
-                This operation returns the description for a webhook.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation returns a description of a webhook for the specified tenant and the specified autoscaling policy.
-            The description is returned in the response body in JSON format.
-            </p>
-      </doc>
       <response status="200">
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </response>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="putWebhook" name="PUT">
-      <doc title="Update Webhook">
-         <db:para role="shortdesc">
-                This operation updates a webhook.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-            This operation changes the specified webhook for a specified enant and autoscaling policy.
-            If the specified webhook is not recognized, the change is ignored.
-            If you submit a URL, the URL is ignored but that does not invalidate the request.
-            If the change is successful, no
-            response body is returned.
-            </p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="deleteWebhook" name="DELETE">
-      <doc title="Delete Webhook">
-         <db:para role="shortdesc">
-                This operation deletes a webhook.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">
-                This operation deletes the webhook for a specified autoscaling policy. If deletion is successful, no response body
-                is returned.
-            </p>
-      </doc>
       <response status="204"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
    <method id="anonymousExecute" name="POST">
-      <doc title="Execute Anonymous Webhook">
-         <db:para role="shortdesc">
-                This operation executes an anonymous webhook.
-            </db:para>
-         <p xmlns="http://www.w3.org/1999/xhtml">This method executes an anonymous webhook.</p>
-      </doc>
       <request>
          <representation mediaType="application/json">
             <doc xml:lang="en"/>
          </representation>
       </request>
       <response status="202"/>
-      <response>
-         <representation mediaType="application/xml" element="identity:identityFault"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="400">
-         <representation mediaType="application/xml" element="identity:badRequest"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="401">
-         <representation mediaType="application/xml" element="identity:unauthorized"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="403">
-         <representation mediaType="application/xml" element="identity:forbidden"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="405">
-         <representation mediaType="application/xml" element="identity:badMethod"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="413">
-         <representation mediaType="application/xml" element="identity:overLimit"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="503">
-         <representation mediaType="application/xml" element="identity:serviceUnavailable"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="404">
-         <representation mediaType="application/xml" element="identity:itemNotFound"/>
-         <representation mediaType="application/json"/>
-      </response>
-      <response status="415">
-         <representation mediaType="application/xml" element="identity:badMediaType"/>
-         <representation mediaType="application/json"/>
-      </response>
    </method>
 </application>

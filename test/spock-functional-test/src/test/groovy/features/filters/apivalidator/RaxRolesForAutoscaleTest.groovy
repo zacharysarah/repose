@@ -46,6 +46,4 @@ class RaxRolesForAutoscaleTest extends ReposeValveTest {
         "POST"   | ["x-roles": "raxRolesDisabled"] | "200"
         "DELETE" | ["x-roles": "raxRolesDisabled"] | "200"
     }
-
-
 }
