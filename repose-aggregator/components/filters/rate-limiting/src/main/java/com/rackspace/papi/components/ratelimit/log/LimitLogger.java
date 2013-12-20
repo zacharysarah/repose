@@ -19,8 +19,8 @@ public class LimitLogger {
 
    public void log(String configured, String used) {
 
-      LOG.info("Rate limiting user " + getSanitizedUserIdentification() + " at limit amount " + used + ".");
-      LOG.info("User rate limited for request " + request.getMethod() + " " + request.getRequestURL() + ".");
+      LOG.info("Rate limiting user " + getSanitizedUserIdentification() + " at limit amount " + used + "");
+      LOG.info("User rate limited for request " + request.getMethod() + " " + request.getRequestURL() + "");
       LOG.info("Configured rate limit is: " + configured);
    }
 
