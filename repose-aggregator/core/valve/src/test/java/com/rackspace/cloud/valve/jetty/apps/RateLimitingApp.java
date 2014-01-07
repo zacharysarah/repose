@@ -1,7 +1,6 @@
 package com.rackspace.cloud.valve.jetty.apps;
 
 import com.rackspace.cloud.valve.jetty.servlet.BasicResponseServlet;
-import com.rackspace.papi.components.datastore.DistributedDatastoreFilter;
 import com.rackspace.papi.components.ratelimit.RateLimitingFilter;
 import com.rackspace.papi.servlet.InitParameter;
 import org.eclipse.jetty.server.Server;
@@ -12,6 +11,8 @@ import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
+//import com.rackspace.papi.components.datastore.DistributedDatastoreFilter;
 
 /**
  *
@@ -30,7 +31,7 @@ public class RateLimitingApp {
         final EnumSet<DispatcherType> dispatchers = EnumSet.allOf(DispatcherType.class);
 
         rootContext.addServlet(BasicResponseServlet.class, "/*");
-        rootContext.addFilter(DistributedDatastoreFilter.class, "/*", dispatchers);
+        //rootContext.addFilter(DistributedDatastoreFilter.class, "/*", dispatchers); TODO: Is this ever used?
         rootContext.addFilter(RateLimitingFilter.class, "/*", dispatchers);
     }
 

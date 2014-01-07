@@ -1,4 +1,4 @@
-import com.rackspace.papi.components.datastore.DistributedDatastoreFilter;
+//import com.rackspace.papi.components.datastore.DistributedDatastoreFilter;
 import com.rackspace.papi.components.ratelimit.RateLimitingFilter;
 import com.rackspace.papi.filter.PowerFilter;
 import com.rackspace.papi.jetty.JettyException;
@@ -40,7 +40,7 @@ public class StandAloneRateLimitingServer extends JettyTestingContext {
         }
       serverBuilder.addContextInitParameter(InitParameter.POWER_API_CONFIG_DIR.getParameterName(), "/home/zinic/ulocal/local/etc/powerapi/rate-limiting");
       serverBuilder.addFilter(PowerFilter.class, "/*");
-      serverBuilder.addFilter(DistributedDatastoreFilter.class, "/*");
+      //serverBuilder.addFilter(DistributedDatastoreFilter.class, "/*"); TODO: do we ever use this for anything?
       serverBuilder.addFilter(RateLimitingFilter.class, "/*");
       serverBuilder.addServlet(DummyServlet.class, "/*");
    }
