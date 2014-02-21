@@ -1,6 +1,7 @@
 package features.core.startup
 
 import framework.ReposeValveTest
+import framework.TestProperties
 import framework.category.Bug
 import framework.category.Slow
 import framework.category.Release
@@ -20,14 +21,7 @@ import static org.linkedin.groovy.util.concurrent.GroovyConcurrentUtils.waitForC
 /**
  * D-15183 Ensure passwords are not logged when in DEBUG mode and config files are updated.
  */
-class ReposeStartup extends ReposeValveTest {
-
-    static def List servers = [
-        new Server('ubuntu', '198.101.159.216', deployDeb(), cleanupDeb()),
-        new Server('centos', '198.61.176.151', deployRpm(), cleanupRpm()),
-        new Server('rhel', '198.61.179.61', deployRpm(), cleanupRpm()),
-        new Server('debian', '198.61.224.119', deployDeb(), cleanupDeb())
-    ]
+class ReposeStartupTest extends ReposeValveTest {
 
     def setupSpec() {
         deproxy = new Deproxy()
@@ -40,7 +34,6 @@ class ReposeStartup extends ReposeValveTest {
 
     static def params
 
-    @Category(Bug)
     def "start repose with installation configs"(){
         given:
         def params = properties.getDefaultTemplateParams()
@@ -49,26 +42,16 @@ class ReposeStartup extends ReposeValveTest {
         repose.configurationProvider.applyConfigs("../../../../installation/configs/filters", params)
         repose.configurationProvider.applyConfigs("../../../../installation/configs/extensions", params)
         repose.start()
-        waitUntilReadyToServiceRequests()
+        repose.waitForNon500FromUrl(properties.reposeEndpoint)
 
         when:
-        MessageChain mc = deproxy.makeRequest([method: 'GET'])
+        MessageChain mc = deproxy.makeRequest(properties.reposeEndpoint + "/v1")
 
         then:
-        mc.receivedResponse.code == '301'
+        mc.receivedResponse.code == '401'
 
         cleanup:
         repose.stop()
-    }
-
-    @Ignore
-    def "deploy and start repose - snapshots"() {
-        //1. copy over repose to server - SNAPSHOT
-        //2. call until get back a 301
-        //3. update system-model to include all filters
-        //4. call until get back a non 500
-        //5. remove repose
-        //TODO: retention policy
     }
 
     @Category(Release)
@@ -125,7 +108,12 @@ class ReposeStartup extends ReposeValveTest {
         }
 
         where:
-        server << getServers()
+        server << [
+                new Server('ubuntu', '198.101.159.216', deployDeb(), cleanupDeb()),
+                new Server('centos', '198.61.176.151', deployRpm(), cleanupRpm()),
+                new Server('rhel', '67.207.152.32', deployRpm(), cleanupRpm()),
+                new Server('debian', '198.61.224.119', deployDeb(), cleanupDeb())
+        ]
     }
 
     static def deployDeb(){
@@ -164,16 +152,15 @@ class ReposeStartup extends ReposeValveTest {
         ]
     }
 
+    private class Server{
+        def name, ip, deploymentSteps, cleanupSteps
 
-}
-
-class Server{
-    def name, ip, deploymentSteps, cleanupSteps
-
-    Server(name, ip, deploymentSteps, cleanupSteps){
-        this.name = name
-        this.ip = ip
-        this.deploymentSteps = deploymentSteps
-        this.cleanupSteps = cleanupSteps
+        Server(name, ip, deploymentSteps, cleanupSteps){
+            this.name = name
+            this.ip = ip
+            this.deploymentSteps = deploymentSteps
+            this.cleanupSteps = cleanupSteps
+        }
     }
 }
+
