@@ -12,6 +12,13 @@ class ReposeLogSearch {
         this.logFileLocation = logFileLocation
     }
 
+    public void clearLog(){
+        File logFile = new File(logFileLocation)
+        if(logFile.exists()){
+            logFile.delete()
+        }
+    }
+
     /**
      * Search the repose log file using the properties log locations specified
      * @param searchString is used to search log file for matches
