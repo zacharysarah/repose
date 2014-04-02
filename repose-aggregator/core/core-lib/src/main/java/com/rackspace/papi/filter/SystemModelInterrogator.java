@@ -28,154 +28,153 @@ import java.util.List;
 @Component("modelInterrogator")
 public class SystemModelInterrogator {
 
-   private static final Logger LOG = LoggerFactory.getLogger(SystemModelInterrogator.class);
-   private final NetworkInterfaceProvider networkInterfaceProvider;
-   private final NetworkNameResolver nameResolver;
-   private final List<Port> ports;
+    private static final Logger LOG = LoggerFactory.getLogger(SystemModelInterrogator.class);
+    private final NetworkInterfaceProvider networkInterfaceProvider;
+    private final NetworkNameResolver nameResolver;
+    private final List<Port> ports;
 
     @Autowired
-   public SystemModelInterrogator(@Qualifier("servicePorts") ServicePorts ports) {
-      this(StaticNetworkNameResolver.getInstance(), StaticNetworkInterfaceProvider.getInstance(), ports);
-   }
+    public SystemModelInterrogator(@Qualifier("servicePorts") ServicePorts ports) {
+        this(StaticNetworkNameResolver.getInstance(), StaticNetworkInterfaceProvider.getInstance(), ports);
+    }
 
-   public SystemModelInterrogator(NetworkNameResolver nameResolver, NetworkInterfaceProvider nip, ServicePorts ports) {
-      this.nameResolver = nameResolver;
-      this.networkInterfaceProvider = nip;
-      this.ports = ports;
-   }
+    public SystemModelInterrogator(NetworkNameResolver nameResolver, NetworkInterfaceProvider nip, ServicePorts ports) {
+        this.nameResolver = nameResolver;
+        this.networkInterfaceProvider = nip;
+        this.ports = ports;
+    }
 
-   public final class DomainNodeWrapper {
+    //todo: FIX
+    public ReposeCluster getLocalServiceDomain(SystemModel systemModel) {
+        ReposeCluster domain = null;
 
-      private final Node node;
+        for (ReposeCluster possibleDomain : systemModel.getReposeCluster()) {
+            //todo: This is really bad, creating objects that are used for just a moment then never again is expensive
+            if (new ServiceDomainWrapper(possibleDomain).containsLocalNodeForPorts(ports)) {
+                domain = possibleDomain;
+                break;
+            }
+        }
 
-      private DomainNodeWrapper(Node node) {
-         if (node == null) {
-            throw new IllegalArgumentException("Node cannot be null");
-         }
-         this.node = node;
-      }
+        return domain;
+    }
 
-      public boolean hasLocalInterface() {
-         boolean result = false;
+    //todo: FIX
+    public Node getLocalHost(SystemModel systemModel) {
+        Node localHost = null;
 
-         try {
-            final InetAddress hostAddress = nameResolver.lookupName(node.getHostname());
-            result = networkInterfaceProvider.hasInterfaceFor(hostAddress);
-         } catch (UnknownHostException uhe) {
-            LOG.error("Unable to look up network host name. Reason: " + uhe.getMessage(), uhe);
-         } catch (SocketException socketException) {
-            LOG.error(socketException.getMessage(), socketException);
-         }
+        for (ReposeCluster domain : systemModel.getReposeCluster()) {
+            Node node = new ServiceDomainWrapper(domain).getLocalNodeForPorts(ports);
 
-         return result;
-      }
+            if (node != null) {
+                localHost = node;
+                break;
+            }
+        }
 
-      private List<Port> getPortsList() {
-         List<Port> portList = new ArrayList<Port>();
-         
-         
-         // TODO Model: use constants or enum for possible protocols
-         if (node.getHttpPort() > 0) {
-            portList.add(new Port("http", node.getHttpPort()));
-         }
-         
-         if (node.getHttpsPort() > 0) {
-            portList.add(new Port("https", node.getHttpsPort()));
-         }
-         
-         return portList;
-      }
+        return localHost;
+    }
 
-   }
+    public Destination getDefaultDestination(SystemModel systemModel) {
+        ServiceDomainWrapper domain = new ServiceDomainWrapper(getLocalServiceDomain(systemModel));
 
-   public final class ServiceDomainWrapper {
+        return domain.getDefaultDestination();
+    }
 
-      private final ReposeCluster domain;
+    public final class ServiceDomainWrapper {
 
-      private ServiceDomainWrapper(ReposeCluster domain) {
-         if (domain == null) {
-            throw new IllegalArgumentException("Domain cannot be null");
-         }
-         this.domain = domain;
-      }
+        private final ReposeCluster domain;
 
-      public boolean containsLocalNodeForPorts(List<Port> ports) {
-         return getLocalNodeForPorts(ports) != null;
-      }
-      
-      public Node getLocalNodeForPorts(List<Port> ports) {
+        private ServiceDomainWrapper(ReposeCluster domain) {
+            if (domain == null) {
+                throw new IllegalArgumentException("Domain cannot be null");
+            }
+            this.domain = domain;
+        }
 
-         Node localhost = null;
-         
-         if (ports.isEmpty()) {
+        public boolean containsLocalNodeForPorts(List<Port> ports) {
+            return getLocalNodeForPorts(ports) != null;
+        }
+
+        public Node getLocalNodeForPorts(List<Port> ports) {
+            Node localhost = null;
+
+            if (ports.isEmpty()) {
+                return localhost;
+            }
+
+            for (Node host : domain.getNodes().getNode()) {
+                DomainNodeWrapper wrapper = new DomainNodeWrapper(host);
+                List<Port> hostPorts = wrapper.getPortsList();
+
+                if (hostPorts.equals(ports) && wrapper.hasLocalInterface()) {
+                    localhost = host;
+                    break;
+
+                }
+            }
+
             return localhost;
-         }
+        }
 
-         for (Node host : domain.getNodes().getNode()) {
-            DomainNodeWrapper wrapper = new DomainNodeWrapper(host);
-            List<Port> hostPorts = wrapper.getPortsList();
-            
-            if (hostPorts.equals(ports) && wrapper.hasLocalInterface()) {
-               localhost = host;
-               break;
+        public Destination getDefaultDestination() {
+            Destination dest = null;
 
+            List<Destination> destinations = new ArrayList<Destination>();
+
+            destinations.addAll(domain.getDestinations().getEndpoint());
+            destinations.addAll(domain.getDestinations().getTarget());
+
+            for (Destination destination : destinations) {
+                if (destination.isDefault()) {
+                    dest = destination;
+                    break;
+                }
             }
-         }
 
-         return localhost;
-      }
+            return dest;
+        }
+    }
 
-      public Destination getDefaultDestination() {
-         Destination dest = null;
+    public final class DomainNodeWrapper {
 
-         List<Destination> destinations = new ArrayList<Destination>();
+        private final Node node;
 
-         destinations.addAll(domain.getDestinations().getEndpoint());
-         destinations.addAll(domain.getDestinations().getTarget());
-
-         for (Destination destination : destinations) {
-            if (destination.isDefault()) {
-               dest = destination;
-               break;
+        private DomainNodeWrapper(Node node) {
+            if (node == null) {
+                throw new IllegalArgumentException("Node cannot be null");
             }
-         }
+            this.node = node;
+        }
 
-         return dest;
-      }
-   }
+        public boolean hasLocalInterface() {
+            boolean result = false;
 
-   public ReposeCluster getLocalServiceDomain(SystemModel systemModel) {
-      ReposeCluster domain = null;
+            try {
+                final InetAddress hostAddress = nameResolver.lookupName(node.getHostname());
+                result = networkInterfaceProvider.hasInterfaceFor(hostAddress);
+            } catch (UnknownHostException uhe) {
+                LOG.error("Unable to look up network host name. Reason: " + uhe.getMessage(), uhe);
+            } catch (SocketException socketException) {
+                LOG.error(socketException.getMessage(), socketException);
+            }
 
-      for (ReposeCluster possibleDomain : systemModel.getReposeCluster()) {
-          //todo: This is really bad, creating objects that are used for just a moment then never again is expensive
-          if (new ServiceDomainWrapper(possibleDomain).containsLocalNodeForPorts(ports)) {
-            domain = possibleDomain;
-            break;
-         }
-      }
+            return result;
+        }
 
-      return domain;
-   }
+        private List<Port> getPortsList() {
+            List<Port> portList = new ArrayList<Port>();
 
-   public Node getLocalHost(SystemModel systemModel) {
-      Node localHost = null;
+            // TODO Model: use constants or enum for possible protocols
+            if (node.getHttpPort() > 0) {
+                portList.add(new Port("http", node.getHttpPort()));
+            }
 
-      for (ReposeCluster domain : systemModel.getReposeCluster()) {
-         Node node = new ServiceDomainWrapper(domain).getLocalNodeForPorts(ports);
+            if (node.getHttpsPort() > 0) {
+                portList.add(new Port("https", node.getHttpsPort()));
+            }
 
-         if (node != null) {
-            localHost = node;
-            break;
-         }
-      }
-
-      return localHost;
-   }
-
-   public Destination getDefaultDestination(SystemModel systemModel) {
-      ServiceDomainWrapper domain = new ServiceDomainWrapper(getLocalServiceDomain(systemModel));
-
-      return domain.getDefaultDestination();
-   }
+            return portList;
+        }
+    }
 }
