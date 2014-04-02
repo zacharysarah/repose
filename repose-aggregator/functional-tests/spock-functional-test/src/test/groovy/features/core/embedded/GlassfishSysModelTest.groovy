@@ -26,7 +26,6 @@ class GlassfishSysModelTest extends Specification {
         def glassfishJar = properties.glassfishJar
         def reposePort = properties.reposePort
         def reposeShutdownPort = properties.reposeShutdownPort
-        def originPort = properties.targetPort
         def logFile = properties.logFile
 
         def params = properties.defaultTemplateParams
@@ -36,10 +35,10 @@ class GlassfishSysModelTest extends Specification {
                 "repose.hostname"  : reposeNodeHostname
         ]
 
-        reposeGlassfishEndpoint = "http://localhost:${reposePort}"
+        reposeGlassfishEndpoint = "http://localhost:${reposePort}/"
 
         deproxy = new Deproxy()
-        deproxy.addEndpoint(originPort)
+        deproxy.addEndpoint(reposePort)
 
         logSearch = new ReposeLogSearch(logFile)
 
