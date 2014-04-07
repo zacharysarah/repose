@@ -66,71 +66,67 @@ public class PowerApiConfigurationManager implements ConfigurationService {
     public ConfigurationResourceResolver getResourceResolver() {
         return this.resourceResolver;
     }
-    
+
     @Override
     public void setUpdateManager(ConfigurationUpdateManager updateManager) {
         this.updateManager = updateManager;
     }
-    
-   @Override
-    public <T> void subscribeTo(String configurationName,  UpdateListener<T> listener, Class<T> configurationClass) {
-        subscribeTo("",configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, null),true);
-       
-    }
-    
+
     @Override
-    public <T> void subscribeTo(String filterName,String configurationName,  UpdateListener<T> listener, Class<T> configurationClass) {
-        subscribeTo(filterName,configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, null),true);
-       
+    public <T> void subscribeTo(String configurationName, UpdateListener<T> listener, Class<T> configurationClass) {
+        subscribeTo("", configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, null), true);
+
     }
-   
+
+    @Override
+    public <T> void subscribeTo(String filterName, String configurationName, UpdateListener<T> listener, Class<T> configurationClass) {
+        subscribeTo(filterName, configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, null), true);
+
+    }
+
     @Override
     public <T> void subscribeTo(String configurationName, URL xsdStreamSource, UpdateListener<T> listener, Class<T> configurationClass) {
-        subscribeTo("",configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, xsdStreamSource),true);
-       
-        
+        subscribeTo("", configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, xsdStreamSource), true);
+
+
     }
 
     @Override
-    public <T> void subscribeTo(String filterName,String configurationName, URL xsdStreamSource, UpdateListener<T> listener, Class<T> configurationClass) {
-        subscribeTo(filterName,configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, xsdStreamSource),true);
-       
-        
-    }
-        
+    public <T> void subscribeTo(String filterName, String configurationName, URL xsdStreamSource, UpdateListener<T> listener, Class<T> configurationClass) {
+        subscribeTo(filterName, configurationName, listener, getPooledJaxbConfigurationParser(configurationClass, xsdStreamSource), true);
 
-    @Override
-    public <T> void subscribeTo(String filterName,String configurationName, UpdateListener<T> listener, ConfigurationParser<T> customParser) {
-        subscribeTo(filterName,configurationName, listener, customParser, true);
+
     }
 
+
     @Override
-    public <T> void subscribeTo(String filterName,String configurationName, UpdateListener<T> listener, ConfigurationParser<T> customParser, boolean sendNotificationNow) {
+    public <T> void subscribeTo(String filterName, String configurationName, UpdateListener<T> listener, ConfigurationParser<T> customParser) {
+        subscribeTo(filterName, configurationName, listener, customParser, true);
+    }
+
+    @Override
+    public <T> void subscribeTo(String filterName, String configurationName, UpdateListener<T> listener, ConfigurationParser<T> customParser, boolean sendNotificationNow) {
         final ConfigurationResource resource = resourceResolver.resolve(configurationName);
-         updateManager.registerListener(listener, resource, customParser,filterName); 
+        updateManager.registerListener(listener, resource, customParser, filterName);
         if (sendNotificationNow) {
             // Initial load of the cfg object
             try {
-                                          
                 listener.configurationUpdated(customParser.read(resource));
-           
-                if(filterName!=null && !filterName.isEmpty() && listener.isInitialized()){
-                     getConfigurationInformation().setFilterLoadingInformation(filterName,listener.isInitialized(), resource);
-                }else{
-                       getConfigurationInformation().setFilterLoadingFailedInformation(filterName, resource,"Failed loading File"); 
-                }
 
-                } catch (Exception ex) {
-                    if(filterName!=null && !filterName.isEmpty()){
-                     getConfigurationInformation().setFilterLoadingFailedInformation(filterName, resource, ex.getMessage()); 
-                    }
-                   // TODO:Refactor - Introduce a helper method so that this logic can be centralized and reused
+                if (filterName != null && !filterName.isEmpty() && listener.isInitialized()) {
+                    getConfigurationInformation().setFilterLoadingInformation(filterName, listener.isInitialized(), resource);
+                } else {
+                    getConfigurationInformation().setFilterLoadingFailedInformation(filterName, resource, "Failed loading File");
+                }
+            } catch (Exception ex) {
+                if (filterName != null && !filterName.isEmpty()) {
+                    getConfigurationInformation().setFilterLoadingFailedInformation(filterName, resource, ex.getMessage());
+                }
+                // TODO:Refactor - Introduce a helper method so that this logic can be centralized and reused
                 if (ex.getCause() instanceof FileNotFoundException) {
                     LOG.error("An I/O error has occured while processing resource " + configurationName + " that is used by filter specified in system-model.cfg.xml - Reason: " + ex.getCause().getMessage());
-                 
                 } else {
                     LOG.error("Configuration update error. Reason: " + ex.getMessage(), ex);
-                  
                 }
             }
         }
@@ -157,5 +153,5 @@ public class PowerApiConfigurationManager implements ConfigurationService {
 
         return parser;
     }
-   
+
 }

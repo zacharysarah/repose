@@ -28,7 +28,7 @@ public class FilterContextInitializer {
    public FilterContextInitializer(FilterConfig filterConfig, ApplicationContext applicationContext) {
       filterContextManager = new FilterContextManagerImpl(filterConfig, applicationContext);
       instanceInfo = (ReposeInstanceInfo) applicationContext.getBean("reposeInstanceInfo");
-      
+
    }
 
    public List<FilterContext> buildFilterContexts(ClassLoaderManagerService classLoaderContextManager, ReposeCluster domain, Node localHost) {

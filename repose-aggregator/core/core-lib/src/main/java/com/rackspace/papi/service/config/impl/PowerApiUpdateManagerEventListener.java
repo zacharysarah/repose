@@ -107,7 +107,7 @@ public class PowerApiUpdateManagerEventListener implements EventListener<Configu
                 // Do nothing
             }
         } catch (InvalidConfigurationException ice) {
-            LOG.error("Invalid configuration content in " + configClass + ". Reason: " + ice.getMessage(), ice);
+            LOG.error("Invalid configuration content in " + configClass + ". Reason: " + ice.getMessage());//, ice);
             LOG.debug("Reporting issue to Health Checker Service: " + issueId);
             try {
                 healthCheckService.reportIssue(healthCheckUID, issueId,

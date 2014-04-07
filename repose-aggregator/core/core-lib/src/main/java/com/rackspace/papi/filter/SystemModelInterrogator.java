@@ -52,7 +52,8 @@ public class SystemModelInterrogator {
             }
         }
 
-        throw new InvalidConfigurationException("Repose could not determine the cluster to which it belongs");
+        throw new InvalidConfigurationException("Unable to identify the local host in the system model - please " +
+                "check your system-model.cfg.xml");
     }
 
     public Node getLocalHost(SystemModel systemModel) throws InvalidConfigurationException {
@@ -64,7 +65,8 @@ public class SystemModelInterrogator {
             }
         }
 
-        throw new InvalidConfigurationException("Repose could not determine the node on which it is running");
+        throw new InvalidConfigurationException("Unable to identify the local host in the system model - please " +
+                "check your system-model.cfg.xml");
     }
 
     public Destination getDefaultDestination(SystemModel systemModel) throws InvalidConfigurationException {
