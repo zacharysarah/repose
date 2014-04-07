@@ -45,6 +45,7 @@ public final class HttpConnectionPoolProvider {
         client.getParams().setParameter(CoreConnectionPNames.MAX_HEADER_COUNT, poolConf.getHttpConnectionMaxHeaderCount());
         client.getParams().setParameter(CoreConnectionPNames.MAX_LINE_LENGTH, poolConf.getHttpConnectionMaxLineLength());
         client.getParams().setParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, poolConf.getHttpSocketBufferSize());
+        client.getParams().setParameter(CoreConnectionPNames.SO_LINGER, 30);
 
         client.setKeepAliveStrategy(new ConnectionKeepAliveWithTimeoutStrategy(poolConf.getKeepaliveTimeout()));
 
