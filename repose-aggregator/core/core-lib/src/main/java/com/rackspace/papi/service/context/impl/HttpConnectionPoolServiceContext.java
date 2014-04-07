@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
@@ -101,7 +102,7 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
         private boolean initialized = false;
 
         @Override
-        public void configurationUpdated(HttpConnectionPoolConfig poolConfig) {
+        public void configurationUpdated(HttpConnectionPoolConfig poolConfig) throws InvalidConfigurationException {
             connectionPoolService.configure(poolConfig);
             initialized = true;
             solveIssue();

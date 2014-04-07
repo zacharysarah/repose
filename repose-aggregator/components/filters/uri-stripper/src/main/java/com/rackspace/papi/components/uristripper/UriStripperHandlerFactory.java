@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.uristripper;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.uristripper.config.UriStripperConfig;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
@@ -38,7 +39,7 @@ public class UriStripperHandlerFactory extends AbstractConfiguredFilterHandlerFa
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(UriStripperConfig config) {
+        public void configurationUpdated(UriStripperConfig config) throws InvalidConfigurationException {
 
             stripId = config.getTokenIndex();
             rewriteLocation = config.isRewriteLocation();

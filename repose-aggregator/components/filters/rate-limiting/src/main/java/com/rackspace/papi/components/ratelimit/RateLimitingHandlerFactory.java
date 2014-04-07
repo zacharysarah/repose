@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.ratelimit;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.components.datastore.Datastore;
@@ -84,7 +85,7 @@ public class RateLimitingHandlerFactory extends AbstractConfiguredFilterHandlerF
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(RateLimitingConfiguration configurationObject) {
+        public void configurationUpdated(RateLimitingConfiguration configurationObject) throws InvalidConfigurationException {
 
             rateLimitCache = new ManagedRateLimitCache(getDatastore(configurationObject.getDatastore()));
 

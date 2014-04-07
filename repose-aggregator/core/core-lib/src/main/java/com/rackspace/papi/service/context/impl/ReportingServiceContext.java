@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.model.*;
@@ -7,12 +8,12 @@ import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.reporting.ReportingService;
-import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContextEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,18 +82,16 @@ public class ReportingServiceContext implements ServiceContext<ReportingService>
       private boolean isInitialized = false;
 
       @Override
-      public void configurationUpdated(ContainerConfiguration configurationObject) {
-
+      public void configurationUpdated(ContainerConfiguration configurationObject) throws InvalidConfigurationException {
           if (configurationObject.getDeploymentConfig() != null) {
-
               synchronized (jmxResetTimeKey) {
                   jmxResetTime = configurationObject.getDeploymentConfig().getJmxResetTime();
               }
 
               reportingService.updateConfiguration(destinationIds, jmxResetTime);
           }
-          isInitialized = true;
 
+          isInitialized = true;
       }
 
       @Override
@@ -109,7 +108,7 @@ public class ReportingServiceContext implements ServiceContext<ReportingService>
       private boolean isInitialized = false;
 
       @Override
-      public void configurationUpdated(SystemModel systemModel) {
+      public void configurationUpdated(SystemModel systemModel) throws InvalidConfigurationException {
 
          final List<String> endpointIds = new ArrayList<String>();
 
@@ -125,7 +124,6 @@ public class ReportingServiceContext implements ServiceContext<ReportingService>
                endpointIds.add(destinationCluster.getId());
             }
          }
-
 
          synchronized (destinationIds) {
             destinationIds.clear();

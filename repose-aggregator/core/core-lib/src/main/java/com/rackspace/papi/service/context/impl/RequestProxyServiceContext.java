@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.proxy.RequestProxyService;
 import com.rackspace.papi.container.config.ContainerConfiguration;
@@ -20,92 +21,93 @@ import javax.servlet.ServletContextEvent;
 @Lazy(true)
 public class RequestProxyServiceContext implements ServiceContext<RequestProxyService> {
 
-  public static final String SERVICE_NAME = "powerapi:/services/proxy";
-  private final ConfigurationService configurationManager;
-  private final RequestProxyService proxyService;
-  private final ServiceRegistry registry;
-  private final ContainerConfigListener configListener;
-  private final SystemModelInterrogator interrogator;
-  private final SystemModelListener systemModelListener;
+    public static final String SERVICE_NAME = "powerapi:/services/proxy";
+    private final ConfigurationService configurationManager;
+    private final RequestProxyService proxyService;
+    private final ServiceRegistry registry;
+    private final ContainerConfigListener configListener;
+    private final SystemModelInterrogator interrogator;
+    private final SystemModelListener systemModelListener;
 
-  @Autowired
-  public RequestProxyServiceContext(
-          @Qualifier("requestProxyService") RequestProxyService proxyService,
-          @Qualifier("serviceRegistry") ServiceRegistry registry,
-          @Qualifier("configurationManager") ConfigurationService configurationManager,
-          @Qualifier("modelInterrogator") SystemModelInterrogator interrogator) {
-    this.proxyService = proxyService;
-    this.configurationManager = configurationManager;
-    this.registry = registry;
-    this.configListener = new ContainerConfigListener();
-    this.systemModelListener = new SystemModelListener();
-    this.interrogator = interrogator;
-  }
-
-  public void register() {
-    if (registry != null) {
-      registry.addService(this);
+    @Autowired
+    public RequestProxyServiceContext(
+            @Qualifier("requestProxyService") RequestProxyService proxyService,
+            @Qualifier("serviceRegistry") ServiceRegistry registry,
+            @Qualifier("configurationManager") ConfigurationService configurationManager,
+            @Qualifier("modelInterrogator") SystemModelInterrogator interrogator) {
+        this.proxyService = proxyService;
+        this.configurationManager = configurationManager;
+        this.registry = registry;
+        this.configListener = new ContainerConfigListener();
+        this.systemModelListener = new SystemModelListener();
+        this.interrogator = interrogator;
     }
-  }
 
-  @Override
-  public String getServiceName() {
-    return SERVICE_NAME;
-  }
-
-  @Override
-  public RequestProxyService getService() {
-    return proxyService;
-  }
-
-  private class ContainerConfigListener implements UpdateListener<ContainerConfiguration> {
-
-    private boolean isInitialized = false;
-
-    @Override
-    public void configurationUpdated(ContainerConfiguration config) {
-      Integer connectionTimeout = config.getDeploymentConfig().getConnectionTimeout();
-      Integer readTimeout = config.getDeploymentConfig().getReadTimeout();
-      Integer proxyThreadPool = config.getDeploymentConfig().getProxyThreadPool();
-      boolean requestLogging = config.getDeploymentConfig().isClientRequestLogging();
-      isInitialized = true;
+    public void register() {
+        if (registry != null) {
+            registry.addService(this);
+        }
     }
 
     @Override
-    public boolean isInitialized() {
-      return isInitialized;
-    }
-  }
-
-  private class SystemModelListener implements UpdateListener<SystemModel> {
-
-    private boolean isInitialized = false;
-
-    @Override
-    public void configurationUpdated(SystemModel config) {
-      ReposeCluster serviceDomain = interrogator.getLocalServiceDomain(config);
-      proxyService.setRewriteHostHeader(serviceDomain.isRewriteHostHeader());
-      isInitialized = true;
+    public String getServiceName() {
+        return SERVICE_NAME;
     }
 
     @Override
-    public boolean isInitialized() {
-      return isInitialized;
+    public RequestProxyService getService() {
+        return proxyService;
     }
-  }
 
-  @Override
-  public void contextInitialized(ServletContextEvent sce) {
-    configurationManager.subscribeTo("container.cfg.xml", configListener, ContainerConfiguration.class);
-    configurationManager.subscribeTo("system-model.cfg.xml", systemModelListener, SystemModel.class);
-    register();
-  }
+    private class ContainerConfigListener implements UpdateListener<ContainerConfiguration> {
 
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-    if (configurationManager != null) {
-      configurationManager.unsubscribeFrom("container.cfg.xml", configListener);
-      configurationManager.unsubscribeFrom("system-model.cfg.xml", systemModelListener);
+        private boolean isInitialized = false;
+
+        @Override
+        public void configurationUpdated(ContainerConfiguration config) throws InvalidConfigurationException {
+            Integer connectionTimeout = config.getDeploymentConfig().getConnectionTimeout();
+            Integer readTimeout = config.getDeploymentConfig().getReadTimeout();
+            Integer proxyThreadPool = config.getDeploymentConfig().getProxyThreadPool();
+            boolean requestLogging = config.getDeploymentConfig().isClientRequestLogging();
+            isInitialized = true;
+        }
+
+        @Override
+        public boolean isInitialized() {
+            return isInitialized;
+        }
     }
-  }
+
+    private class SystemModelListener implements UpdateListener<SystemModel> {
+
+        private boolean isInitialized = false;
+
+        @Override
+        public void configurationUpdated(SystemModel config) throws InvalidConfigurationException {
+            ReposeCluster serviceDomain = interrogator.getLocalServiceDomain(config);
+
+            proxyService.setRewriteHostHeader(serviceDomain.isRewriteHostHeader());
+            isInitialized = true;
+        }
+
+        @Override
+        public boolean isInitialized() {
+            return isInitialized;
+        }
+    }
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        configurationManager.subscribeTo("container.cfg.xml", configListener, ContainerConfiguration.class);
+        configurationManager.subscribeTo("system-model.cfg.xml", systemModelListener, SystemModel.class);
+        register();
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        if (configurationManager != null) {
+            configurationManager.unsubscribeFrom("container.cfg.xml", configListener);
+            configurationManager.unsubscribeFrom("system-model.cfg.xml", systemModelListener);
+        }
+    }
 }

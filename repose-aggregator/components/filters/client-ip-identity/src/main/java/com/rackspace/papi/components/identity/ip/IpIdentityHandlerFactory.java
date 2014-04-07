@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.ip;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.net.IpAddressRange;
 import com.rackspace.papi.components.identity.ip.config.IpIdentityConfig;
@@ -35,7 +36,7 @@ public class IpIdentityHandlerFactory extends AbstractConfiguredFilterHandlerFac
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(IpIdentityConfig configurationObject) {
+        public void configurationUpdated(IpIdentityConfig configurationObject) throws InvalidConfigurationException {
             config = configurationObject;
             whitelist = new ArrayList<IpAddressRange>();
             if (config.getWhiteList() != null) {

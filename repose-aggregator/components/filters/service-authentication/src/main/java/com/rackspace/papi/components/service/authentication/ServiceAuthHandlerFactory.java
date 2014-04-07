@@ -1,11 +1,12 @@
 package com.rackspace.papi.components.service.authentication;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
-import java.io.UnsupportedEncodingException;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class ServiceAuthHandlerFactory extends AbstractConfiguredFilterHandlerFa
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ServiceAuthenticationConfig configurationObject) {
+        public void configurationUpdated(ServiceAuthenticationConfig configurationObject) throws InvalidConfigurationException {
             config = configurationObject;
             basicAuthCredentials = "";
 

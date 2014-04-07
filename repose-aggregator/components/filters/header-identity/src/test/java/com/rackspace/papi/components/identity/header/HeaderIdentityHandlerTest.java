@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.header;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.PowerApiHeader;
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
 import com.rackspace.papi.components.identity.header.config.HeaderIdentityConfig;
@@ -58,7 +59,11 @@ public class HeaderIdentityHandlerTest {
             headerList.getHeader().add(header);
 
             config.setSourceHeaders(headerList);
-            factory.configurationUpdated(config);
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
             
             handler = factory.buildHandler();
             

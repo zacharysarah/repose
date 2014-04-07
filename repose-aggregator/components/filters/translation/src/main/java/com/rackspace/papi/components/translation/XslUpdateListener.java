@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.translation;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.config.parser.generic.GenericResourceConfigurationParser;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
@@ -49,7 +50,7 @@ public class XslUpdateListener implements UpdateListener<ConfigurationResource> 
     }
 
     @Override
-    public void configurationUpdated(ConfigurationResource config) {
+    public void configurationUpdated(ConfigurationResource config) throws InvalidConfigurationException {
         LOG.info("XSL file changed: " + config.name());
         factory.buildProcessorPools();
         isInitialized = true;

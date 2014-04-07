@@ -4,8 +4,9 @@
  */
 package com.rackspace.papi.components.header.translation;
 
-import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
-import com.rackspace.papi.components.header.translation.config.*;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
+import com.rackspace.papi.components.header.translation.config.Header;
+import com.rackspace.papi.components.header.translation.config.HeaderTranslationType;
 import com.rackspace.papi.filter.logic.FilterDirector;
 import com.rackspace.papi.filter.logic.impl.FilterDirectorImpl;
 import org.junit.Before;
@@ -55,7 +56,13 @@ public class HeaderTranslationHandlerTest {
             header1.setRemoveOriginal(Boolean.TRUE);
 
             config.getHeader().add(header1);
-            factory.configurationUpdated(config);
+
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
             request = mock(HttpServletRequest.class);
 
@@ -229,7 +236,13 @@ public class HeaderTranslationHandlerTest {
             header1.setRemoveOriginal(Boolean.FALSE);
 
             config.getHeader().add(header1);
-            factory.configurationUpdated(config);
+
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
             request = mock(HttpServletRequest.class);
 

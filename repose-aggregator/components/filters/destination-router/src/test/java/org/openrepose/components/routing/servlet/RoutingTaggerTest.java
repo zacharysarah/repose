@@ -1,5 +1,6 @@
 package org.openrepose.components.routing.servlet;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.filter.logic.FilterDirector;
 import com.rackspace.papi.filter.logic.impl.FilterDirectorImpl;
 import com.rackspace.papi.model.*;
@@ -7,12 +8,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.openrepose.components.routing.servlet.config.DestinationRouterConfiguration;
 import org.openrepose.components.routing.servlet.config.Target;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.openrepose.components.routing.servlet.config.DestinationRouterConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -67,8 +68,12 @@ public class RoutingTaggerTest {
             serviceDomain.setDestinations(destinationList);
             
             destinationRouterConfig.setTarget(target);
-            factory.configurationUpdated(destinationRouterConfig);
 
+            try {
+                factory.configurationUpdated(destinationRouterConfig);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
 
             httpServletRequest = mock(HttpServletRequest.class);
             httpServletResponse = mock(HttpServletResponse.class);

@@ -1,5 +1,6 @@
 package org.openrepose.rackspace.auth_2_0.identity.content.auth;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.transform.json.JacksonJaxbTransform;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
@@ -45,7 +46,7 @@ public class ContentIdentityAuthHandlerFactory extends AbstractConfiguredFilterH
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContentIdentityAuthConfig configurationObject) {
+        public void configurationUpdated(ContentIdentityAuthConfig configurationObject) throws InvalidConfigurationException {
             config = configurationObject;
             LOG.debug("Configuration updated (quality = '" + config.getQuality() + "' group = '" + config.getGroup() + "')");
             isInitialized = true;

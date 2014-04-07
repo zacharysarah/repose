@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.container.config.DeploymentConfiguration;
@@ -7,14 +8,13 @@ import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.container.ContainerConfigurationService;
-
-import java.net.URL;
-import javax.servlet.ServletContextEvent;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletContextEvent;
+import java.net.URL;
 
 @Component("containerServiceContext")
 public class ContainerServiceContext implements ServiceContext<ContainerConfigurationService> {
@@ -64,7 +64,7 @@ public class ContainerServiceContext implements ServiceContext<ContainerConfigur
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContainerConfiguration configurationObject) {
+        public void configurationUpdated(ContainerConfiguration configurationObject) throws InvalidConfigurationException {
             DeploymentConfiguration deployConfig = configurationObject.getDeploymentConfig();
             String via = deployConfig.getVia();
 

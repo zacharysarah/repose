@@ -1,5 +1,6 @@
 package com.rackspace.papi.filter;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.net.NetworkInterfaceProvider;
 import com.rackspace.papi.commons.util.net.NetworkNameResolver;
 import com.rackspace.papi.commons.util.net.StaticNetworkInterfaceProvider;
@@ -44,19 +45,17 @@ public class SystemModelInterrogator {
         this.ports = ports;
     }
 
-    //todo: FIX
-    public ReposeCluster getLocalServiceDomain(SystemModel systemModel) {
+    public ReposeCluster getLocalServiceDomain(SystemModel systemModel) throws InvalidConfigurationException {
         for (ReposeCluster cluster : systemModel.getReposeCluster()) {
             if (containsLocalNodeForPorts(cluster, ports)) {
                 return cluster;
             }
         }
 
-        return null;
+        throw new InvalidConfigurationException("Repose could not determine the cluster to which it belongs");
     }
 
-    //todo: FIX
-    public Node getLocalHost(SystemModel systemModel) {
+    public Node getLocalHost(SystemModel systemModel) throws InvalidConfigurationException {
         for (ReposeCluster cluster : systemModel.getReposeCluster()) {
             Node node = getLocalNodeForPorts(cluster, ports);
 
@@ -65,10 +64,10 @@ public class SystemModelInterrogator {
             }
         }
 
-        return null;
+        throw new InvalidConfigurationException("Repose could not determine the node on which it is running");
     }
 
-    public Destination getDefaultDestination(SystemModel systemModel) {
+    public Destination getDefaultDestination(SystemModel systemModel) throws InvalidConfigurationException {
         ReposeCluster reposeCluster = getLocalServiceDomain(systemModel);
 
         return getDefaultDestination(reposeCluster);

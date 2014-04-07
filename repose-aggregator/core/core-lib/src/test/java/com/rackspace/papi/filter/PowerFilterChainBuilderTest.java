@@ -2,6 +2,7 @@ package com.rackspace.papi.filter;
 
 import com.oracle.javaee6.FilterType;
 import com.oracle.javaee6.FullyQualifiedClassType;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.classloader.ear.EarClassLoader;
 import com.rackspace.papi.commons.util.classloader.ear.EarClassLoaderContext;
 import com.rackspace.papi.commons.util.classloader.ear.EarDescriptor;
@@ -67,7 +68,7 @@ public class PowerFilterChainBuilderTest {
       }
 
       @Test
-      public void shouldBuild() throws ClassNotFoundException {
+      public void shouldBuild() throws ClassNotFoundException, InvalidConfigurationException {
          ClassLoaderManagerService mockedEarClassLoaderContextManager = mock(ClassLoaderManagerService.class);
 
          EarClassLoaderContext mockedEarClassLoaderContext = mock(EarClassLoaderContext.class);
@@ -114,7 +115,7 @@ public class PowerFilterChainBuilderTest {
       }
 
       @Test
-      public void shouldReturnEmptyList() throws ClassNotFoundException {
+      public void shouldReturnEmptyList() throws ClassNotFoundException, InvalidConfigurationException {
          ClassLoaderManagerService mockedEarClassLoaderContextManager = mock(ClassLoaderManagerService.class);
 
          EarClassLoaderContext mockedEarClassLoaderContext = mock(EarClassLoaderContext.class);

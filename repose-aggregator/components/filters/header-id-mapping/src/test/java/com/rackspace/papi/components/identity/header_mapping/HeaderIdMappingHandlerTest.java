@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.header_mapping;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.PowerApiHeader;
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
 import com.rackspace.papi.components.identity.header_mapping.config.HeaderIdMappingConfig;
@@ -62,7 +63,12 @@ public class HeaderIdMappingHandlerTest {
          header.setGroupHeader(GROUP_HEADER_NAME_2);
          headerList.getHeader().add(header);
          config.setSourceHeaders(headerList);
-         factory.configurationUpdated(config);
+
+         try {
+             factory.configurationUpdated(config);
+         } catch (InvalidConfigurationException ice) {
+             assert false;
+         }
          
          handler = factory.buildHandler();
          request = mock(HttpServletRequest.class);

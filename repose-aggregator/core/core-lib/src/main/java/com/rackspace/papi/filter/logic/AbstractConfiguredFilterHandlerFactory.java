@@ -1,5 +1,6 @@
 package com.rackspace.papi.filter.logic;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.thread.KeyedStackLock;
 
@@ -40,7 +41,7 @@ public abstract class AbstractConfiguredFilterHandlerFactory<T extends FilterLog
     }
 
     @Override
-    public void configurationUpdated(Object configurationObject) {
+    public void configurationUpdated(Object configurationObject) throws InvalidConfigurationException {
         UpdateListener listener = listeners.get(configurationObject.getClass());
         if (listener != null) {
 

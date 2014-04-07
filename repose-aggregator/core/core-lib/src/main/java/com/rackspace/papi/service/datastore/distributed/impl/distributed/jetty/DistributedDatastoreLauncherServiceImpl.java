@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.datastore.distributed.impl.distributed.jetty;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.domain.ReposeInstanceInfo;
@@ -112,7 +113,7 @@ public class DistributedDatastoreLauncherServiceImpl implements DistributedDatas
         private boolean initialized = false;
 
         @Override
-        public void configurationUpdated(DistributedDatastoreConfiguration configurationObject) {
+        public void configurationUpdated(DistributedDatastoreConfiguration configurationObject) throws InvalidConfigurationException {
             synchronized (configLock) {
                 distributedDatastoreConfiguration = configurationObject;
             }

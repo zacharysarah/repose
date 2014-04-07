@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.hnorm;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.hnorm.util.CompiledRegexAndList;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
@@ -38,7 +39,7 @@ public class HeaderNormalizationHandlerFactory extends AbstractConfiguredFilterH
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(HeaderNormalizationConfig configurationObject) {
+        public void configurationUpdated(HeaderNormalizationConfig configurationObject) throws InvalidConfigurationException {
             compiledTargetList.clear();
             final HeaderFilterList filterList = configurationObject.getHeaderFilters();
             CompiledRegexAndList compiledRegexAndList;

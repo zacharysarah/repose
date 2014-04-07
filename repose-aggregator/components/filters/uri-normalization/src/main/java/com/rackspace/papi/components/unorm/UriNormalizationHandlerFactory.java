@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.unorm;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.http.normal.QueryStringNormalizer;
 import com.rackspace.papi.components.unorm.normalizer.MediaTypeNormalizer;
@@ -28,7 +29,7 @@ public class UriNormalizationHandlerFactory extends AbstractConfiguredFilterHand
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(UriNormalizationConfig configurationObject) {
+        public void configurationUpdated(UriNormalizationConfig configurationObject) throws InvalidConfigurationException {
             final UriFilterList uriFilterList = configurationObject.getUriFilters();
             final Map<String, QueryParameterNormalizer> newNormalizers = new HashMap<String, QueryParameterNormalizer>();
 

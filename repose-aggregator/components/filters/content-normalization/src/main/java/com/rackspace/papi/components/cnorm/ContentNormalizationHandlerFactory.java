@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.cnorm;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.cnorm.normalizer.HeaderNormalizer;
 import com.rackspace.papi.components.cnorm.normalizer.MediaTypeNormalizer;
@@ -33,7 +34,7 @@ public class ContentNormalizationHandlerFactory extends AbstractConfiguredFilter
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContentNormalizationConfig configurationObject) {
+        public void configurationUpdated(ContentNormalizationConfig configurationObject) throws InvalidConfigurationException {
             final HeaderFilterList headerList = configurationObject.getHeaderFilters();
             final MediaTypeList mediaTypeList = configurationObject.getMediaTypes();
 

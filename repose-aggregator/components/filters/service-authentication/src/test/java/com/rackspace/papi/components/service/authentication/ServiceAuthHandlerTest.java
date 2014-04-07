@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.service.authentication;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.CommonHttpHeader;
 import com.rackspace.papi.commons.util.http.HttpStatusCode;
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
@@ -48,7 +49,12 @@ public class ServiceAuthHandlerTest {
             credentials.setUsername(username);
 
             basicAuthConfig.setCredentials(credentials);
-            factory.configurationUpdated(basicAuthConfig);
+
+            try {
+                factory.configurationUpdated(basicAuthConfig);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
             
             handler = factory.buildHandler();
 

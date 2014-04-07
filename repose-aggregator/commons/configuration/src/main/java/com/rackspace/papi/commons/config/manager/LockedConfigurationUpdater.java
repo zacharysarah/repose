@@ -12,15 +12,14 @@ public abstract class LockedConfigurationUpdater<T> implements UpdateListener<T>
     private final Object updateKey;
 
     private boolean isInitialized = false;
-   
-    
+
     public LockedConfigurationUpdater(KeyedStackLock updateLock, Object updateKey) {
         this.updateLock = updateLock;
         this.updateKey = updateKey;
     }
 
     @Override
-    public final void configurationUpdated(T configurationObject) {
+    public final void configurationUpdated(T configurationObject) throws InvalidConfigurationException {
         updateLock.lock(updateKey);
 
         try {
@@ -28,15 +27,14 @@ public abstract class LockedConfigurationUpdater<T> implements UpdateListener<T>
         } finally {
             updateLock.unlock(updateKey);
         }
-          isInitialized = true;
+        isInitialized = true;
     }
 
     @Override
-    public boolean isInitialized(){
-     return isInitialized;
+    public boolean isInitialized() {
+        return isInitialized;
     }
 
-  
 
     protected abstract void onConfigurationUpdated(T configurationObject);
 }

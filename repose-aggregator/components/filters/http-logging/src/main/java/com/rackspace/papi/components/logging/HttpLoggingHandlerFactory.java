@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.logging;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.logging.apache.HttpLogFormatter;
 import com.rackspace.papi.components.logging.config.FileTarget;
@@ -44,7 +45,7 @@ public class HttpLoggingHandlerFactory extends AbstractConfiguredFilterHandlerFa
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(HttpLoggingConfig modifiedConfig) {
+        public void configurationUpdated(HttpLoggingConfig modifiedConfig) throws InvalidConfigurationException {
             //Clean up~
             destroy();
 

@@ -2,6 +2,7 @@ package org.openrepose.components.rackspace.authz;
 
 import com.rackspace.auth.openstack.AuthenticationService;
 import com.rackspace.auth.openstack.AuthenticationServiceFactory;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
 import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
@@ -38,7 +39,7 @@ public class RequestAuthorizationHandlerFactory extends AbstractConfiguredFilter
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(RackspaceAuthorization configurationObject) {
+        public void configurationUpdated(RackspaceAuthorization configurationObject) throws InvalidConfigurationException {
             authorizationConfiguration = configurationObject;
 
             final AuthenticationServer serverInfo = authorizationConfiguration.getAuthenticationServer();

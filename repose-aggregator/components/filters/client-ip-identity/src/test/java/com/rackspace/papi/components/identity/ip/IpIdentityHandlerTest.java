@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.ip;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.CommonHttpHeader;
 import com.rackspace.papi.commons.util.http.PowerApiHeader;
 import com.rackspace.papi.commons.util.net.IpAddressRange;
@@ -46,7 +47,7 @@ public class IpIdentityHandlerTest {
     * Test of handleRequest method, of class IpIdentityHandler.
     */
    @Test
-   public void testHandleRequest() {
+   public void testHandleRequest() throws InvalidConfigurationException {
       config = new IpIdentityConfig();
       config.setQuality(QUALITY);
       factory.configurationUpdated(config);
@@ -72,7 +73,7 @@ public class IpIdentityHandlerTest {
    }
 
    @Test
-   public void shouldAddWhiteListGroupAndQuality() {      
+   public void shouldAddWhiteListGroupAndQuality() throws InvalidConfigurationException {
       config = new IpIdentityConfig();
       config.setQuality(QUALITY);
       WhiteList whiteList = new WhiteList();
@@ -91,7 +92,7 @@ public class IpIdentityHandlerTest {
    }
 
    @Test
-   public void shouldUseXForwardedForHeaderWithWhitelistRange() {      
+   public void shouldUseXForwardedForHeaderWithWhitelistRange() throws InvalidConfigurationException {
       final String IP = "192.168.1.1";
       final String NETWORK = "192.168.0.0/16";
       config = new IpIdentityConfig();
@@ -112,7 +113,7 @@ public class IpIdentityHandlerTest {
    }
 
    @Test
-   public void shouldUseXForwardedForHeader() {      
+   public void shouldUseXForwardedForHeader() throws InvalidConfigurationException {
       final String IP = "192.169.1.1";
       final String NETWORK = "192.168.0.0/16";
       config = new IpIdentityConfig();

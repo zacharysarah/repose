@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.uri;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.components.identity.uri.config.IdentificationMapping;
@@ -38,11 +39,9 @@ public class UriIdentityHandlerFactory extends AbstractConfiguredFilterHandlerFa
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(UriIdentityConfig configurationObject) {
-
+        public void configurationUpdated(UriIdentityConfig configurationObject) throws InvalidConfigurationException {
             config = configurationObject;
             patterns.clear();
-
 
             for (IdentificationMapping identificationMapping : config.getIdentificationMappings().getMapping()) {
                 patterns.add(Pattern.compile(identificationMapping.getIdentificationRegex()));

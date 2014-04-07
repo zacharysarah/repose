@@ -1,5 +1,6 @@
 package org.openrepose.components.apivalidator.filter;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.parser.generic.GenericResourceConfigurationParser;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
 import com.rackspace.papi.commons.util.http.header.HeaderValue;
@@ -56,7 +57,11 @@ public class ApiValidatorHandlerFactoryTest {
             URL resource = this.getClass().getClassLoader().getResource("");
             instance = new ApiValidatorHandlerFactory(configService, resource.getPath(), "", null);
 
-            instance.configurationUpdated(config);
+            try {
+                instance.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
             
             roles = new ArrayList<HeaderValue>();
             roles.add(new HeaderValueImpl(role));
@@ -121,11 +126,11 @@ public class ApiValidatorHandlerFactoryTest {
         }
         
         @Test
-        public void shouldClearMatchedValidator() throws MalformedURLException {
+        public void shouldClearMatchedValidator() throws MalformedURLException, InvalidConfigurationException {
             String wadl2Path = new URL(instance.getWadlPath(wadl2)).toString();
             ConfigurationResource resource = mock(ConfigurationResource.class);
             when(resource.name()).thenReturn(wadl2Path);
-            
+
             instance.getWadlListener().configurationUpdated(resource);
             
             verify(info1, times(0)).reinitValidator();
@@ -133,11 +138,11 @@ public class ApiValidatorHandlerFactoryTest {
         }
         
         @Test
-        public void shouldClearAllValidatorsIfNoMatch() throws MalformedURLException {
+        public void shouldClearAllValidatorsIfNoMatch() throws MalformedURLException, InvalidConfigurationException {
             String wadl2Path = new URL(instance.getWadlPath("doesn'texist.wadl")).toString();
             ConfigurationResource resource = mock(ConfigurationResource.class);
             when(resource.name()).thenReturn(wadl2Path);
-            
+
             instance.getWadlListener().configurationUpdated(resource);
             
             verify(info1).reinitValidator();

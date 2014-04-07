@@ -1,16 +1,18 @@
 package com.rackspace.components.compression;
 
-import com.rackspace.external.pjlcompression.CompressingFilter;
-import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.components.compression.util.CompressionConfigWrapper;
-import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
-import java.util.Map;
-import javax.servlet.FilterConfig;
 import com.rackspace.components.compression.util.CompressionParameters;
-import java.util.HashMap;
-import javax.servlet.ServletException;
+import com.rackspace.external.pjlcompression.CompressingFilter;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
+import com.rackspace.papi.commons.config.manager.UpdateListener;
+import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CompressionHandlerFactory extends AbstractConfiguredFilterHandlerFactory<CompressionHandler> {
 
@@ -39,7 +41,7 @@ public class CompressionHandlerFactory extends AbstractConfiguredFilterHandlerFa
       private boolean isInitialized = false;
 
       @Override
-      public void configurationUpdated(ContentCompressionConfig configurationObject) {
+      public void configurationUpdated(ContentCompressionConfig configurationObject) throws InvalidConfigurationException {
          contentCompressionConfig = configurationObject.getCompression();
 
          config.setInitParameter(CompressionParameters.STATS_ENABLED.getParam(), String.valueOf(contentCompressionConfig.isStatsEnabled()));

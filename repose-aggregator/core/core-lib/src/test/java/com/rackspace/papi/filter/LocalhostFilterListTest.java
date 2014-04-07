@@ -1,5 +1,6 @@
 package com.rackspace.papi.filter;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.domain.Port;
 import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.model.*;
@@ -38,7 +39,7 @@ public class LocalhostFilterListTest {
       }
 
       @Test
-      public void shouldGetLocalhostFilters() {
+      public void shouldGetLocalhostFilters() throws InvalidConfigurationException {
          SystemModel mockedPowerProxy = mock(SystemModel.class);
          List<ReposeCluster> domains = createTestHosts();
          when(mockedPowerProxy.getReposeCluster()).thenReturn(domains);

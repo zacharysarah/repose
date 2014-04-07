@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,13 +42,23 @@ public class LockedConfigurationUpdaterTest {
             Thread t1 = new Thread() {
                 @Override
                 public void run() {
-                    updater1.configurationUpdated(config);
+                    try {
+                        updater1.configurationUpdated(config);
+                    } catch(InvalidConfigurationException ice) {
+                        // fail
+                        assertTrue(false);
+                    }
                 }
             };
             Thread t2 = new Thread() {
                 @Override
                 public void run() {
-                    updater2.configurationUpdated(config);
+                    try {
+                        updater2.configurationUpdated(config);
+                    } catch(InvalidConfigurationException ice) {
+                        // fail
+                        assertTrue(false);
+                    }
                 }
             };
 
@@ -70,13 +81,23 @@ public class LockedConfigurationUpdaterTest {
             Thread t1 = new Thread() {
                 @Override
                 public void run() {
-                    updater1.configurationUpdated(config);
+                    try {
+                        updater1.configurationUpdated(config);
+                    } catch(InvalidConfigurationException ice) {
+                        // fail
+                        assertTrue(false);
+                    }
                 }
             };
             Thread t2 = new Thread() {
                 @Override
                 public void run() {
-                    updater2.configurationUpdated(config);
+                    try {
+                        updater2.configurationUpdated(config);
+                    } catch(InvalidConfigurationException ice) {
+                        // fail
+                        assertTrue(false);
+                    }
                 }
             };
 

@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.translation;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.pooling.GenericBlockingResourcePool;
 import com.rackspace.papi.commons.util.pooling.Pool;
@@ -155,7 +156,7 @@ public class TranslationHandlerFactory extends AbstractConfiguredFilterHandlerFa
     private boolean isInitialized = false;
 
     @Override
-    public void configurationUpdated(TranslationConfig newConfig) {
+    public void configurationUpdated(TranslationConfig newConfig) throws InvalidConfigurationException {
       synchronized (lock) {
         configuration = newConfig;
 

@@ -4,23 +4,17 @@
  */
 package com.rackspace.components.compression;
 
-import com.rackspace.papi.commons.util.http.HttpStatusCode;
-import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletRequest;
-import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletResponse;
-import com.rackspace.papi.filter.logic.impl.FilterLogicHandlerDelegate;
-import java.io.IOException;
-import java.util.Vector;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import java.util.Vector;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.rackspace.papi.filter.logic.FilterDirector;
-import com.rackspace.papi.filter.logic.common.AbstractFilterLogicHandler;
 
 public class CompressionHandlerFactoryTest {
 
@@ -52,7 +46,7 @@ public class CompressionHandlerFactoryTest {
    }
 
    @Test
-   public void shouldInitializeCompressionHandlerFactory() {
+   public void shouldInitializeCompressionHandlerFactory() throws InvalidConfigurationException {
 
       factory.configurationUpdated(config);
       assertTrue("Should initialize new content compression handler factory", factory.isInitialized());
@@ -65,7 +59,7 @@ public class CompressionHandlerFactoryTest {
    }
 
    @Test
-   public void shouldBuildCompressionHandler() {
+   public void shouldBuildCompressionHandler() throws InvalidConfigurationException {
 
       factory.configurationUpdated(config);
       CompressionHandler handler = factory.buildHandler();

@@ -1,5 +1,6 @@
 package com.rackspace.papi.servlet.boot.service.config;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.config.parser.common.ConfigurationParser;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
@@ -60,7 +61,7 @@ public class PowerApiConfigurationUpdateManagerTest {
         public void shouldInitializeCleanly() {
             mockAll();
 
-            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager);
+            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager, null);
             updateManger.initialize(context);
         }
 
@@ -68,7 +69,7 @@ public class PowerApiConfigurationUpdateManagerTest {
         public void shouldRegisterListeners() {
             mockAll();
 
-            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager);
+            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager, null);
             updateManger.initialize(context);
 
             updateManger.registerListener(listener, resource,
@@ -92,7 +93,7 @@ public class PowerApiConfigurationUpdateManagerTest {
         public void shouldUnregisterListeners() {
             mockAll();
 
-            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager);
+            final PowerApiConfigurationUpdateManager updateManger = new PowerApiConfigurationUpdateManager(eventManager, null);
             updateManger.initialize(context);
 
             updateManger.registerListener(listener, resource,
@@ -138,7 +139,7 @@ public class PowerApiConfigurationUpdateManagerTest {
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(String configurationObject) {
+        public void configurationUpdated(String configurationObject) throws InvalidConfigurationException {
             isInitialized = true;
             throw new UnsupportedOperationException("Not supported yet.");
 

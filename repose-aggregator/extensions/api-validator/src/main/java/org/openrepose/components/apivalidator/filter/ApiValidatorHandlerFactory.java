@@ -1,5 +1,6 @@
 package org.openrepose.components.apivalidator.filter;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.config.parser.generic.GenericResourceConfigurationParser;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
@@ -132,7 +133,7 @@ public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerF
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ValidatorConfiguration configurationObject) {
+        public void configurationUpdated(ValidatorConfiguration configurationObject) throws InvalidConfigurationException {
             validatorConfiguration = configurationObject;
             unsubscribeAll();
             initialize();
@@ -159,7 +160,7 @@ public class ApiValidatorHandlerFactory extends AbstractConfiguredFilterHandlerF
         }
 
         @Override
-        public void configurationUpdated(ConfigurationResource config) {
+        public void configurationUpdated(ConfigurationResource config) throws InvalidConfigurationException {
             LOG.info("WADL file changed: " + config.name());
 
             synchronized (lock) {

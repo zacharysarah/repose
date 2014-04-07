@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.translation;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.components.translation.config.*;
 import com.rackspace.papi.service.config.ConfigurationService;
 import org.junit.Before;
@@ -25,11 +26,9 @@ public class TranslationHandlerFactoryTest {
             manager = mock(ConfigurationService.class);
             factory = new TranslationHandlerFactory(manager, "", "");
         }
-        
-   
-        
+
         @Test
-        public void shouldCreateProcessorPoolsOnConfigUpdate() {
+        public void shouldCreateProcessorPoolsOnConfigUpdate() throws InvalidConfigurationException {
             TranslationConfig config = new TranslationConfig();
             RequestTranslations requestTranslations = new RequestTranslations();
             ResponseTranslations responseTranslations = new ResponseTranslations();

@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.ip;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.PowerApiHeader;
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
 import com.rackspace.papi.components.identity.ip.config.IpIdentityConfig;
@@ -30,8 +31,12 @@ public class IpIdentityHandlerFactoryTest {
 
         config = new IpIdentityConfig();
         config.setQuality(QUALITY);
-        
-        factory.configurationUpdated(config);
+
+        try {
+            factory.configurationUpdated(config);
+        } catch (InvalidConfigurationException ice) {
+            assert false;
+        }
 
         handler = factory.buildHandler();
         request = mock(HttpServletRequest.class);
@@ -41,7 +46,7 @@ public class IpIdentityHandlerFactoryTest {
     }
 
     @Test
-    public void shouldCatchConfigurationUpdate(){
+    public void shouldCatchConfigurationUpdate() throws InvalidConfigurationException {
         
         final Double QUALITY2 = 0.6;
         final String QUALITY2_VALUE = ";q=0.6";
@@ -60,7 +65,7 @@ public class IpIdentityHandlerFactoryTest {
     }
     
     @Test
-    public void shouldUseDefaultQuality(){
+    public void shouldUseDefaultQuality() throws InvalidConfigurationException {
         
         final String DEFAULT_QUALITY_VALUE = ";q=0.1";
         
@@ -74,7 +79,7 @@ public class IpIdentityHandlerFactoryTest {
     }
     
     @Test
-    public void shouldUseDefaultQualityIfConfigIsBlank(){
+    public void shouldUseDefaultQualityIfConfigIsBlank() throws InvalidConfigurationException {
         
         final String DEFAULT_QUALITY_VALUE = ";q=0.1";
         

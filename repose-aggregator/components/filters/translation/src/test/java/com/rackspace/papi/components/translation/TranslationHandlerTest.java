@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.translation;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.io.BufferedServletInputStream;
 import com.rackspace.papi.commons.util.io.RawInputStreamReader;
 import com.rackspace.papi.commons.util.servlet.http.MutableHttpServletRequest;
@@ -78,7 +79,13 @@ public class TranslationHandlerTest {
             
             config.setRequestTranslations(requestTranslations);
             config.setResponseTranslations(responseTranslations);
-            factory.configurationUpdated(config);
+
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
 
             mockedRequest = mock(HttpServletRequest.class);
@@ -231,7 +238,13 @@ public class TranslationHandlerTest {
             
             config.setRequestTranslations(requestTranslations);
             config.setResponseTranslations(responseTranslations);
-            factory.configurationUpdated(config);
+
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
 
             mockedRequest = mock(HttpServletRequest.class);

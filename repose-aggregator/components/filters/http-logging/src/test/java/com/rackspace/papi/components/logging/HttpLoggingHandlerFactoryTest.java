@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.logging;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.components.logging.config.FileTarget;
 import com.rackspace.papi.components.logging.config.HttpLog;
 import com.rackspace.papi.components.logging.config.HttpLoggingConfig;
@@ -82,7 +83,7 @@ public class HttpLoggingHandlerFactoryTest {
     
 
       @Test
-      public void shouldGetNewLoggersWhenConfigUpdated() {
+      public void shouldGetNewLoggersWhenConfigUpdated() throws InvalidConfigurationException {
          instance.configurationUpdated(loggingConfig);
          final int actual = instance.getLoggers().size();
 
@@ -96,7 +97,7 @@ public class HttpLoggingHandlerFactoryTest {
       }
       
       @Test
-      public void shouldNotAddLoggersWithNullFiles() {
+      public void shouldNotAddLoggersWithNullFiles() throws InvalidConfigurationException {
          instance.configurationUpdated(nullFileTargetLoggerConfig);
          final int actualWrapperCount = instance.getLoggers().size();
          final int expectedWrapperCount = 1;

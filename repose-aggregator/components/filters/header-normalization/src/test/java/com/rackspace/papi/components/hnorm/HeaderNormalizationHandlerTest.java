@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.hnorm;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.filter.logic.FilterDirector;
 import com.rackspace.papi.filter.logic.impl.FilterDirectorImpl;
 import com.rackspacecloud.api.docs.repose.header_normalization.v1.*;
@@ -75,7 +76,12 @@ public class HeaderNormalizationHandlerTest {
 
             config.setHeaderFilters(headerFilterList);
 
-            factory.configurationUpdated(config);
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
 
             request = mock(HttpServletRequest.class);
@@ -194,7 +200,12 @@ public class HeaderNormalizationHandlerTest {
 
             config.setHeaderFilters(headerFilterList);
 
-            factory.configurationUpdated(config);
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
 
             request = mock(HttpServletRequest.class);
@@ -326,7 +337,12 @@ public class HeaderNormalizationHandlerTest {
 
             config.setHeaderFilters(headerFilterList);
 
-            factory.configurationUpdated(config);
+            try {
+                factory.configurationUpdated(config);
+            } catch (InvalidConfigurationException ice) {
+                assert false;
+            }
+
             handler = factory.buildHandler();
 
             request = mock(HttpServletRequest.class);

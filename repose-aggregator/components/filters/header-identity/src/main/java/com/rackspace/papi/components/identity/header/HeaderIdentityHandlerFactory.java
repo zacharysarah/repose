@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.header;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.identity.header.config.HeaderIdentityConfig;
 import com.rackspace.papi.components.identity.header.config.HttpHeader;
@@ -32,7 +33,7 @@ public class HeaderIdentityHandlerFactory extends AbstractConfiguredFilterHandle
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(HeaderIdentityConfig configurationObject) {
+        public void configurationUpdated(HeaderIdentityConfig configurationObject) throws InvalidConfigurationException {
             sourceHeaders = configurationObject.getSourceHeaders().getHeader();
             isInitialized = true;
         }

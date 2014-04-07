@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.service.ServiceRegistry;
@@ -82,7 +83,7 @@ public class ManagementServiceContext implements ServiceContext<ManagementServic
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContainerConfiguration configurationObject) {
+        public void configurationUpdated(ContainerConfiguration configurationObject) throws InvalidConfigurationException {
 
             if (configurationObject.getDeploymentConfig() != null) {
 

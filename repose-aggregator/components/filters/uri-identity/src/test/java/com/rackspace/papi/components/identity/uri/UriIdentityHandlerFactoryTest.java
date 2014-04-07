@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.uri;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.util.http.PowerApiHeader;
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse;
 import com.rackspace.papi.components.identity.uri.config.IdentificationMapping;
@@ -56,7 +57,11 @@ public class UriIdentityHandlerFactoryTest {
 
         config.setIdentificationMappings(identificationMappingList);
 
-        factory.configurationUpdated(config);
+        try {
+            factory.configurationUpdated(config);
+        } catch (InvalidConfigurationException ice) {
+            assert false;
+        }
 
         handler = factory.buildHandler();
         request = mock(HttpServletRequest.class);
@@ -77,7 +82,11 @@ public class UriIdentityHandlerFactoryTest {
 
         config.setIdentificationMappings(identificationMappingList);
 
-        factory.configurationUpdated(config);
+        try {
+            factory.configurationUpdated(config);
+        } catch (InvalidConfigurationException ice) {
+            assert false;
+        }
 
         handler = factory.buildHandler();
 

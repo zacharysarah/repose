@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
@@ -108,7 +109,7 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
         private boolean initialized = false;
 
         @Override
-        public void configurationUpdated(MetricsConfiguration metricsC) {
+        public void configurationUpdated(MetricsConfiguration metricsC) throws InvalidConfigurationException {
 
             // we are reinitializing the graphite servers
             metricsService.shutdownGraphite();

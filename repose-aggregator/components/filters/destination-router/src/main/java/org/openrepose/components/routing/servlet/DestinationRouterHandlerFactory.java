@@ -1,5 +1,6 @@
 package org.openrepose.components.routing.servlet;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
 import com.rackspace.papi.service.reporting.metrics.MetricsService;
@@ -28,7 +29,7 @@ public class DestinationRouterHandlerFactory extends AbstractConfiguredFilterHan
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(DestinationRouterConfiguration configurationObject) {
+        public void configurationUpdated(DestinationRouterConfiguration configurationObject) throws InvalidConfigurationException {
             contextRouterConfiguration = configurationObject;
 
             if (contextRouterConfiguration == null || configurationObject.getTarget() == null) {

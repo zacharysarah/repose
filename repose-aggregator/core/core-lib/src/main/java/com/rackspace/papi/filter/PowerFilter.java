@@ -1,6 +1,7 @@
 package com.rackspace.papi.filter;
 
 import com.rackspace.papi.ResponseCode;
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.http.HttpStatusCode;
 import com.rackspace.papi.commons.util.servlet.filter.ApplicationContextAwareFilter;
@@ -85,9 +86,13 @@ public class PowerFilter extends ApplicationContextAwareFilter {
 
             if (currentSystemModel != null) {
                 SystemModelInterrogator interrogator = new SystemModelInterrogator(ports);
-                localHost = interrogator.getLocalHost(currentSystemModel);
-                serviceDomain = interrogator.getLocalServiceDomain(currentSystemModel);
-                defaultDst = interrogator.getDefaultDestination(currentSystemModel);
+                try {
+                    localHost = interrogator.getLocalHost(currentSystemModel);
+                    serviceDomain = interrogator.getLocalServiceDomain(currentSystemModel);
+                    defaultDst = interrogator.getDefaultDestination(currentSystemModel);
+                } catch (InvalidConfigurationException ice) {
+                    LOG.error("The currentSystemModel is invalid. This should never occur.");
+                }
                 final List<FilterContext> newFilterChain = new FilterContextInitializer(
                         filterConfig,
                         ServletContextHelper.getInstance(filterConfig.getServletContext()).getApplicationContext()).buildFilterContexts(papiContext.classLoader(), serviceDomain, localHost);
@@ -103,7 +108,7 @@ public class PowerFilter extends ApplicationContextAwareFilter {
 
         // TODO:Review - There's got to be a better way of initializing PowerFilter. Maybe the app management service could be queryable.
         @Override
-        public void configurationUpdated(SystemModel configurationObject) {
+        public void configurationUpdated(SystemModel configurationObject) throws InvalidConfigurationException {
             currentSystemModel = configurationObject;
 
             // This event must be fired only after we have finished configuring the system.
@@ -119,6 +124,7 @@ public class PowerFilter extends ApplicationContextAwareFilter {
                     localHost = interrogator.getLocalHost(currentSystemModel);
                     serviceDomain = interrogator.getLocalServiceDomain(currentSystemModel);
                     defaultDst = interrogator.getDefaultDestination(currentSystemModel);
+
                     final List<FilterContext> newFilterChain = new FilterContextInitializer(
                             filterConfig,
                             ServletContextHelper.getInstance(filterConfig.getServletContext()).getApplicationContext()).buildFilterContexts(papiContext.classLoader(), serviceDomain, localHost);

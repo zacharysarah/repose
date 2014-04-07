@@ -1,20 +1,21 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.rms.ResponseMessageService;
 import com.rackspace.papi.service.rms.config.ResponseMessagingConfiguration;
-import java.io.IOException;
-import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContextEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.URL;
 
 @Component("responseMessageServiceContext")
 public class ResponseMessageServiceContext implements ServiceContext<ResponseMessageService> {
@@ -77,7 +78,7 @@ public class ResponseMessageServiceContext implements ServiceContext<ResponseMes
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ResponseMessagingConfiguration configurationObject) {
+        public void configurationUpdated(ResponseMessagingConfiguration configurationObject) throws InvalidConfigurationException {
        
             messageService.setInitialized();
             messageService.updateConfiguration(configurationObject.getStatusCode());

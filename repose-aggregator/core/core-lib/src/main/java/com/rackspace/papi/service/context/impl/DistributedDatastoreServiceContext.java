@@ -1,7 +1,9 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.domain.ReposeInstanceInfo;
+import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.Service;
 import com.rackspace.papi.model.SystemModel;
@@ -10,14 +12,14 @@ import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.datastore.DatastoreService;
 import com.rackspace.papi.service.datastore.DistributedDatastoreLauncherService;
-import java.net.URL;
-import javax.servlet.ServletContextEvent;
+import com.rackspace.papi.service.routing.RoutingService;
+import com.rackspace.papi.servlet.InitParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import com.rackspace.papi.domain.ServicePorts;
-import com.rackspace.papi.service.routing.RoutingService;
-import com.rackspace.papi.servlet.InitParameter;
+
+import javax.servlet.ServletContextEvent;
+import java.net.URL;
 
 /*
  * Class that will listen to system-model.cfg.xml and dist-datastore.cfg.xml file to launch the distributed-datastore servlet
@@ -86,8 +88,7 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
    private class SystemModelConfigurationListener implements UpdateListener<SystemModel> {
 
       @Override
-      public void configurationUpdated(SystemModel configurationObject) {
-
+      public void configurationUpdated(SystemModel configurationObject) throws InvalidConfigurationException {
          systemModel = configurationObject;
 
          ReposeCluster cluster = findCluster(systemModel);
@@ -101,8 +102,6 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
          } else if(!listed && initialized) { // case when someone has turned off an existing datastore
             distDatastoreServiceLauncher.stopDistributedDatastoreServlet();
          }
-
-
       }
 
       @Override
@@ -111,7 +110,6 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
       }
 
       private ReposeCluster findCluster(SystemModel sysModel) {
-
          ReposeCluster cluster = null;
 
          for (ReposeCluster cls : sysModel.getReposeCluster()) {
@@ -125,12 +123,10 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
       }
 
       private boolean servicesDefined(ReposeCluster cluster) {
-
          return cluster.getServices() != null;
       }
 
       private boolean serviceListed(ReposeCluster cluster) {
-
          boolean listed = false;
 
          if (servicesDefined(cluster)) {

@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.header.translation;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.header.translation.config.Header;
 import com.rackspace.papi.components.header.translation.config.HeaderTranslationType;
@@ -40,7 +41,7 @@ public class HeaderTranslationHandlerFactory extends AbstractConfiguredFilterHan
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(HeaderTranslationType headerTranslationTypeConfigObject) {
+        public void configurationUpdated(HeaderTranslationType headerTranslationTypeConfigObject) throws InvalidConfigurationException {
             sourceHeaders = headerTranslationTypeConfigObject.getHeader();
             isInitialized = true;
         }

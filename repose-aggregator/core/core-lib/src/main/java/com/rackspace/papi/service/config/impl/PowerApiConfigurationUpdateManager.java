@@ -9,6 +9,7 @@ import com.rackspace.papi.commons.util.thread.Poller;
 import com.rackspace.papi.jmx.ConfigurationInformation;
 import com.rackspace.papi.service.context.ServletContextHelper;
 import com.rackspace.papi.service.event.common.EventService;
+import com.rackspace.papi.service.healthcheck.HealthCheckService;
 import com.rackspace.papi.service.threading.ThreadingService;
 
 import javax.servlet.ServletContext;
@@ -24,27 +25,27 @@ public class PowerApiConfigurationUpdateManager implements ConfigurationUpdateMa
    private DestroyableThreadWrapper resrouceWatcherThread;
    private ConfigurationInformation configurationInformation;
 
-   public PowerApiConfigurationUpdateManager(EventService eventManager) {
+   public PowerApiConfigurationUpdateManager(EventService eventManager, HealthCheckService healthCheckService) {
       this.eventManager = eventManager;
 
       listenerMap = new HashMap<String, Map<Integer, ParserListenerPair>>();
-      powerApiUpdateManagerEventListener = new PowerApiUpdateManagerEventListener(listenerMap);
+      powerApiUpdateManagerEventListener = new PowerApiUpdateManagerEventListener(listenerMap, healthCheckService);
    }
 
    public void initialize(ServletContext ctx) {
       final ThreadingService threadingService = ServletContextHelper.getInstance(ctx).getPowerApiContext().threadingService();
-      
+
       configurationInformation =(ConfigurationInformation)ServletContextHelper.getInstance(ctx).getPowerApiContext().reposeConfigurationInformation();
       // Initialize the resource watcher
       resourceWatcher = new ConfigurationResourceWatcher(eventManager);
 
        //TODO: Make this interval configurable
       final Poller pollerLogic = new Poller(resourceWatcher, 15000);
-      
+
       resrouceWatcherThread = new DestroyableThreadWrapper(
               threadingService.newThread(pollerLogic, "Configuration Watcher Thread"), pollerLogic);
       resrouceWatcherThread.start();
-      
+
       // Listen for configuration events
       eventManager.listen(powerApiUpdateManagerEventListener, ConfigurationEvent.class);
    }

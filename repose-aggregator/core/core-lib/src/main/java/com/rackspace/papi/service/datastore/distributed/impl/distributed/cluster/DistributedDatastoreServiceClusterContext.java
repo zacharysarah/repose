@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.datastore.distributed.impl.distributed.cluster;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.datastore.distributed.ClusterView;
 import com.rackspace.papi.components.datastore.impl.distributed.ThreadSafeClusterView;
@@ -90,7 +91,7 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(DistributedDatastoreConfiguration configurationObject) {
+        public void configurationUpdated(DistributedDatastoreConfiguration configurationObject) throws InvalidConfigurationException {
 
             synchronized (configLock) {
                 curDistributedDatastoreConfiguration = configurationObject;
@@ -117,8 +118,7 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(SystemModel configurationObject) {
-
+        public void configurationUpdated(SystemModel configurationObject) throws InvalidConfigurationException {
             synchronized (configLock) {
                 curSystemModel = configurationObject;
                 if (curSystemModel != null) {

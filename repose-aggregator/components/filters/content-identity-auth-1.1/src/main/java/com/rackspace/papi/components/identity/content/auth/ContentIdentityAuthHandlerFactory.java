@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.identity.content.auth;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.transform.Transform;
 import com.rackspace.papi.commons.util.transform.jaxb.StreamToJaxbTransform;
@@ -48,7 +49,7 @@ public class ContentIdentityAuthHandlerFactory extends AbstractConfiguredFilterH
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContentIdentityAuthConfig configurationObject) {
+        public void configurationUpdated(ContentIdentityAuthConfig configurationObject) throws InvalidConfigurationException {
             config = configurationObject;
             LOG.debug("Configuration updated (quality = '" + config.getQuality() + "' group = '" + config.getGroup() + "')");
             isInitialized = true;

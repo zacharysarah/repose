@@ -1,5 +1,6 @@
 package com.rackspace.papi.jmx;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
 import com.rackspace.papi.commons.util.digest.impl.SHA1MessageDigester;
@@ -112,7 +113,7 @@ public class ConfigurationInformation implements ConfigurationInformationMBean, 
       }
 
       @Override
-      public void configurationUpdated(SystemModel systemModel) {
+      public void configurationUpdated(SystemModel systemModel) throws InvalidConfigurationException {
          LOG.info("System model updated");
          initialized = false;
 

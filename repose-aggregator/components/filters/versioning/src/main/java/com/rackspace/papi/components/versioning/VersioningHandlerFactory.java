@@ -1,5 +1,6 @@
 package com.rackspace.papi.components.versioning;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.components.versioning.config.ServiceVersionMapping;
 import com.rackspace.papi.components.versioning.config.ServiceVersionMappingList;
@@ -51,10 +52,11 @@ public class VersioningHandlerFactory extends AbstractConfiguredFilterHandlerFac
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(SystemModel configurationObject) {
+        public void configurationUpdated(SystemModel configurationObject) throws InvalidConfigurationException {
             SystemModelInterrogator interrogator = new SystemModelInterrogator(ports);
             localDomain = interrogator.getLocalServiceDomain(configurationObject);
             localHost = interrogator.getLocalHost(configurationObject);
+
             List<Destination> destinations = new ArrayList<Destination>();
 
             destinations.addAll(localDomain.getDestinations().getEndpoint());
@@ -77,7 +79,7 @@ public class VersioningHandlerFactory extends AbstractConfiguredFilterHandlerFac
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ServiceVersionMappingList mappings) {
+        public void configurationUpdated(ServiceVersionMappingList mappings) throws InvalidConfigurationException {
             configuredMappings.clear();
 
             for (ServiceVersionMapping mapping : mappings.getVersionMapping()) {

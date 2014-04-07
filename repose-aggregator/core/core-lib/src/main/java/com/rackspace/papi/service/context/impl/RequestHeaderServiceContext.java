@@ -1,5 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.domain.ServicePorts;
@@ -82,16 +83,15 @@ public class RequestHeaderServiceContext implements ServiceContext<RequestHeader
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ContainerConfiguration configurationObject) {
-
+        public void configurationUpdated(ContainerConfiguration configurationObject) throws InvalidConfigurationException {
             if (configurationObject.getDeploymentConfig() != null) {
                 viaReceivedBy = configurationObject.getDeploymentConfig().getVia();
 
                 final ViaRequestHeaderBuilder viaBuilder = new ViaRequestHeaderBuilder(reposeVersion, viaReceivedBy, hostname);
                 requestHeaderService.updateConfig(viaBuilder);
             }
-            isInitialized = true;
 
+            isInitialized = true;
         }
 
         @Override
@@ -109,16 +109,15 @@ public class RequestHeaderServiceContext implements ServiceContext<RequestHeader
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(SystemModel systemModel) {
-
+        public void configurationUpdated(SystemModel systemModel) throws InvalidConfigurationException {
             final SystemModelInterrogator interrogator = new SystemModelInterrogator(ports);
             final Node localHost = interrogator.getLocalHost(systemModel);
+
             hostname = localHost.getHostname();
 
             final ViaRequestHeaderBuilder viaBuilder = new ViaRequestHeaderBuilder(reposeVersion, viaReceivedBy, hostname);
             requestHeaderService.updateConfig(viaBuilder);
             isInitialized = true;
-
         }
 
         @Override

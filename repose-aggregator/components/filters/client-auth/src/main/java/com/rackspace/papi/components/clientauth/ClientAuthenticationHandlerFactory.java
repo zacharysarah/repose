@@ -1,11 +1,12 @@
 package com.rackspace.papi.components.clientauth;
 
+import com.rackspace.papi.commons.config.manager.InvalidConfigurationException;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.commons.util.http.ServiceClient;
 import com.rackspace.papi.commons.util.regex.KeyedRegexExtractor;
-import com.rackspace.papi.components.clientauth.atomfeed.FeedListenerManager;
 import com.rackspace.papi.components.clientauth.atomfeed.AuthFeedReader;
+import com.rackspace.papi.components.clientauth.atomfeed.FeedListenerManager;
 import com.rackspace.papi.components.clientauth.atomfeed.sax.SaxAuthFeedReader;
 import com.rackspace.papi.components.clientauth.common.AuthenticationHandler;
 import com.rackspace.papi.components.clientauth.common.UriMatcher;
@@ -17,10 +18,10 @@ import com.rackspace.papi.components.clientauth.openstack.config.ClientMapping;
 import com.rackspace.papi.components.clientauth.openstack.v1_0.OpenStackAuthenticationHandlerFactory;
 import com.rackspace.papi.components.clientauth.rackspace.config.AccountMapping;
 import com.rackspace.papi.components.clientauth.rackspace.v1_1.RackspaceAuthenticationHandlerFactory;
-import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
-import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
 import com.rackspace.papi.components.datastore.Datastore;
+import com.rackspace.papi.filter.logic.AbstractConfiguredFilterHandlerFactory;
 import com.rackspace.papi.service.httpclient.HttpClientService;
+import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class ClientAuthenticationHandlerFactory extends AbstractConfiguredFilter
         private boolean isInitialized = false;
 
         @Override
-        public void configurationUpdated(ClientAuthConfig modifiedConfig) {
+        public void configurationUpdated(ClientAuthConfig modifiedConfig) throws InvalidConfigurationException {
 
             updateUriMatcher(modifiedConfig.getWhiteList());
 
