@@ -2,9 +2,11 @@ package features.core.embedded
 
 import framework.*
 import org.rackspace.deproxy.Deproxy
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
+@Ignore
 class GlassfishSysModelTest extends Specification {
     static Deproxy deproxy
     static ReposeLauncher repose
