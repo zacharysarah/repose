@@ -1,6 +1,10 @@
 package com.rackspace.auth.openstack;
 
-import com.rackspace.auth.*;
+import com.rackspace.auth.AuthGroup;
+import com.rackspace.auth.AuthGroups;
+import com.rackspace.auth.AuthServiceException;
+import com.rackspace.auth.AuthToken;
+import com.rackspace.auth.ResponseUnmarshaller;
 import com.rackspace.docs.identity.api.ext.rax_ksgrp.v1.Group;
 import com.rackspace.docs.identity.api.ext.rax_ksgrp.v1.Groups;
 import com.rackspace.papi.commons.util.StringUtilities;
@@ -11,7 +15,13 @@ import com.rackspace.papi.commons.util.transform.jaxb.JaxbEntityToXml;
 import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.openstack.docs.identity.api.v2.*;
+import org.openstack.docs.identity.api.v2.AuthenticateResponse;
+import org.openstack.docs.identity.api.v2.AuthenticationRequest;
+import org.openstack.docs.identity.api.v2.Endpoint;
+import org.openstack.docs.identity.api.v2.EndpointList;
+import org.openstack.docs.identity.api.v2.ObjectFactory;
+import org.openstack.docs.identity.api.v2.PasswordCredentialsRequiredUsername;
+import org.openstack.docs.identity.api.v2.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +156,7 @@ public class AuthenticationServiceClient implements AuthenticationService {
 
         ServiceClientResponse<EndpointList> endpointListResponse = akkaServiceClient.get(ENDPOINTS_PREFIX + userToken, targetHostUri + TOKENS + userToken +
                 ENDPOINTS, headers);
-        List<Endpoint> endpointList = new ArrayList<Endpoint>();
+        List<Endpoint> endpointList;
 
         switch (HttpStatusCode.fromInt(endpointListResponse.getStatusCode())) {
             case OK:

@@ -4,7 +4,11 @@ import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
-import com.rackspace.papi.service.healthcheck.*;
+import com.rackspace.papi.service.healthcheck.HealthCheckReport;
+import com.rackspace.papi.service.healthcheck.HealthCheckService;
+import com.rackspace.papi.service.healthcheck.InputNullException;
+import com.rackspace.papi.service.healthcheck.NotRegisteredException;
+import com.rackspace.papi.service.healthcheck.Severity;
 import com.rackspace.papi.service.httpclient.HttpClientService;
 import com.rackspace.papi.service.httpclient.config.HttpConnectionPoolConfig;
 import org.slf4j.Logger;
@@ -48,7 +52,7 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
         try {
             healthCheckUID = healthCheckService.register(this.getClass());
         } catch (InputNullException e) {
-            LOG.error("Unable to register to health check service");
+            LOG.error("Unable to register to health check service", e);
         }
 
     }
@@ -84,7 +88,7 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
                 solveIssue();
             }
         } catch (IOException io) {
-            LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME);
+            LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME, io);
         }
         register();
     }
@@ -122,7 +126,7 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
         } catch (InputNullException e) {
             LOG.error("Unable to report Issues to Health Check Service");
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to report Issues to Health Check Service");
+            LOG.error("Unable to report Issues to Health Check Service", e);
         }
 
     }
@@ -133,9 +137,9 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
             LOG.debug("Resolving issue: " + httpConnectionPoolServiceReport);
             healthCheckService.solveIssue(healthCheckUID, httpConnectionPoolServiceReport);
         } catch (InputNullException e) {
-            LOG.error("Unable to solve issue " + httpConnectionPoolServiceReport + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + httpConnectionPoolServiceReport + "from " + healthCheckUID, e);
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to solve issue " + httpConnectionPoolServiceReport + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + httpConnectionPoolServiceReport + "from " + healthCheckUID, e);
         }
 
     }
