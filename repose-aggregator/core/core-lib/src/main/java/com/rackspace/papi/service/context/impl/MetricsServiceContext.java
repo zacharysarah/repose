@@ -4,7 +4,11 @@ import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
-import com.rackspace.papi.service.healthcheck.*;
+import com.rackspace.papi.service.healthcheck.HealthCheckReport;
+import com.rackspace.papi.service.healthcheck.HealthCheckService;
+import com.rackspace.papi.service.healthcheck.InputNullException;
+import com.rackspace.papi.service.healthcheck.NotRegisteredException;
+import com.rackspace.papi.service.healthcheck.Severity;
 import com.rackspace.papi.service.reporting.metrics.MetricsService;
 import com.rackspace.papi.service.reporting.metrics.config.GraphiteServer;
 import com.rackspace.papi.service.reporting.metrics.config.MetricsConfiguration;
@@ -52,7 +56,7 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
         try{
             healthCheckUID = healthCheckService.register(this.getClass());
         } catch (InputNullException e) {
-            LOG.error("Unable to register to health check service");
+            LOG.error("Unable to register to health check service", e);
         }
 
     }
@@ -91,7 +95,7 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
                 solveIssue();
             }
         }catch(IOException io){
-            LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME);
+            LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME, io);
         }
         register();
     }
@@ -148,9 +152,9 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
             healthCheckService.reportIssue(healthCheckUID, metricsServiceConfigReport,
                     new HealthCheckReport("Metrics Service Configuration Error", Severity.BROKEN));
         } catch (InputNullException e) {
-            LOG.error("Unable to report Issues to Health Check Service");
+            LOG.error("Unable to report Issues to Health Check Service", e);
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to report Issues to Health Check Service");
+            LOG.error("Unable to report Issues to Health Check Service", e);
         }
 
     }
@@ -161,9 +165,9 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
             LOG.debug("Resolving issue: " + metricsServiceConfigReport);
             healthCheckService.solveIssue(healthCheckUID, metricsServiceConfigReport);
         } catch (InputNullException e) {
-            LOG.error("Unable to solve issue " + metricsServiceConfigReport + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + metricsServiceConfigReport + "from " + healthCheckUID, e);
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to solve issue " + metricsServiceConfigReport + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + metricsServiceConfigReport + "from " + healthCheckUID, e);
         }
 
     }

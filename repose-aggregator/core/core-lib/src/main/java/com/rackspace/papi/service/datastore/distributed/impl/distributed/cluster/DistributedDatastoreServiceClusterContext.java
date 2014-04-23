@@ -12,7 +12,11 @@ import com.rackspace.papi.service.datastore.DatastoreAccessControl;
 import com.rackspace.papi.service.datastore.distributed.config.DistributedDatastoreConfiguration;
 import com.rackspace.papi.service.datastore.distributed.impl.distributed.cluster.utils.AccessListDeterminator;
 import com.rackspace.papi.service.datastore.distributed.impl.distributed.cluster.utils.ClusterMemberDeterminator;
-import com.rackspace.papi.service.healthcheck.*;
+import com.rackspace.papi.service.healthcheck.HealthCheckReport;
+import com.rackspace.papi.service.healthcheck.HealthCheckService;
+import com.rackspace.papi.service.healthcheck.InputNullException;
+import com.rackspace.papi.service.healthcheck.NotRegisteredException;
+import com.rackspace.papi.service.healthcheck.Severity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +69,7 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
         try{
             healthCheckUID = healthCheckService.register(this.getClass());
         } catch (InputNullException e) {
-
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -196,7 +200,7 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
                 solveIssue(systemModelConfigHealthReport);
             }
         } catch (IOException e) {
-            LOG.error("Unable to search for " + DEFAULT_CONFIG);
+            LOG.error("Unable to search for " + DEFAULT_CONFIG, e);
         }
         sce.getServletContext().setAttribute("ddClusterViewService", service);
         register();
@@ -216,9 +220,9 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
         try{
             healthCheckService.reportIssue(healthCheckUID, rid, new HealthCheckReport(message, severity));
         } catch (InputNullException e) {
-            LOG.error("Unable to report Issues to Health Check Service");
+            LOG.error("Unable to report Issues to Health Check Service", e);
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to report Issues to Health Check Service");
+            LOG.error("Unable to report Issues to Health Check Service", e);
         }
 
     }
@@ -229,9 +233,9 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
             LOG.debug("Resolving issue: " +rid);
             healthCheckService.solveIssue(healthCheckUID, rid);
         } catch (InputNullException e) {
-            LOG.error("Unable to solve issue " + rid + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + rid + "from " + healthCheckUID, e);
         } catch (NotRegisteredException e) {
-            LOG.error("Unable to solve issue " + rid + "from " + healthCheckUID);
+            LOG.error("Unable to solve issue " + rid + "from " + healthCheckUID, e);
         }
 
     }
