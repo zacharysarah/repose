@@ -104,6 +104,7 @@ public class DistributedDatastoreServlet extends HttpServlet {
                     break;
                 default:
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    break;
             }
         } catch (IOException ioe) {
             LOG.error(ioe.getMessage(), ioe);
@@ -151,6 +152,7 @@ public class DistributedDatastoreServlet extends HttpServlet {
                         break;
                     default:
                         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        break;
                 }
             }
         } else {
@@ -172,8 +174,10 @@ public class DistributedDatastoreServlet extends HttpServlet {
                 LOG.error(cnfe.getMessage(), cnfe);
                 throw new DatastoreOperationException("Failed to deserialize a message. Couldn't find a matching class.", cnfe);
             } catch (MalformedCacheRequestException mcre) {
+                LOG.error(mcre.getMessage(), mcre);
                 handleputMalformedCacheRequestException(mcre, response);
             } catch (ClassCastException e){
+                LOG.error(e.getMessage(), e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             }
         } else {
@@ -242,6 +246,7 @@ public class DistributedDatastoreServlet extends HttpServlet {
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                break;
         }
 
     }
