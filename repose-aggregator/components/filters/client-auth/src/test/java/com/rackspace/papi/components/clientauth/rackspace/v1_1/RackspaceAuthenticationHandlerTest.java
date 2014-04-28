@@ -225,9 +225,9 @@ public class RackspaceAuthenticationHandlerTest {
 
             assertTrue("When groups exist, handler must add X-PP-Groups header",
                        requestDirector.requestHeaderManager().headersToAdd()
-                               .get(PowerApiHeader.GROUPS.toString().toLowerCase()).contains("group-id;q=1"));
+                               .get(PowerApiHeader.GROUPS.toString()).contains("group-id;q=1"));
             assertTrue("Handler must add X-PP-User header", requestDirector.requestHeaderManager().headersToAdd()
-                    .get(PowerApiHeader.USER.toString().toLowerCase()).contains("accountId;q=1"));
+                    .get(PowerApiHeader.USER.toString()).contains("accountId;q=1"));
             assertTrue("Auth component must set X Authorization header when in delegated mode",
                        requestDirector.requestHeaderManager().headersToAdd().get("x-authorization").iterator().next()
                                .equalsIgnoreCase(xAuthProxy + " accountId"));
