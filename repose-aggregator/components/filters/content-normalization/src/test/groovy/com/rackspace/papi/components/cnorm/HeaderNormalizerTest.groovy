@@ -62,11 +62,11 @@ class HeaderNormalizerTest extends Specification {
         def headersToRemove = director.requestHeaderManager().headersToRemove()
 
         then:
-        headersToRemove.contains(authHeader.getId().toLowerCase())
-        headersToRemove.contains(userHeader.getId().toLowerCase())
+        headersToRemove.contains(authHeader.getId())
+        headersToRemove.contains(userHeader.getId())
         !headersToRemove.contains("accept")
-        !headersToRemove.contains(groupHeader.getId().toLowerCase())
-        !headersToRemove.contains(contentType.getId().toLowerCase())
+        !headersToRemove.contains(groupHeader.getId())
+        !headersToRemove.contains(contentType.getId())
     }
 
 }

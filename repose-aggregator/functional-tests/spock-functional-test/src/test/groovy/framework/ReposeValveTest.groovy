@@ -31,7 +31,7 @@ abstract class ReposeValveTest extends Specification {
 
         properties = new TestProperties()
 
-        switch (properties.getReposeContainer().toLowerCase()) {
+        switch (properties.getReposeContainer()) {
             case "valve":
                 configureReposeValve()
                 repose.configurationProvider.cleanConfigDirectory()

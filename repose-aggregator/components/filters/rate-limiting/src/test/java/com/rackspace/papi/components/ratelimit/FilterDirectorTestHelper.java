@@ -15,29 +15,29 @@ import static org.junit.Assert.assertTrue;
 public final class FilterDirectorTestHelper {
 
    public static void directorMustAddHeaderToRequest(FilterDirector filterDirector, String headerKey) {
-      assertTrue("FilterDirector must add header, \"" + headerKey + "\" to the request.", filterDirector.requestHeaderManager().headersToAdd().containsKey(headerKey.toLowerCase()));
+      assertTrue("FilterDirector must add header, \"" + headerKey + "\" to the request.", filterDirector.requestHeaderManager().headersToAdd().containsKey(headerKey));
    }
 
    public static void directorMustRemoveHeaderToRequest(FilterDirector filterDirector, String headerKey) {
-      assertTrue("FilterDirector must remove header, \"" + headerKey + "\" from the request.", filterDirector.requestHeaderManager().headersToRemove().contains(headerKey.toLowerCase()));
+      assertTrue("FilterDirector must remove header, \"" + headerKey + "\" from the request.", filterDirector.requestHeaderManager().headersToRemove().contains(headerKey));
    }
 
    public static void directorMustAddHeaderValueToRequest(FilterDirector filterDirector, String headerKey, String expectedValue) {
-      final Set<String> actualValues = filterDirector.requestHeaderManager().headersToAdd().get(headerKey.toLowerCase());
+      final Set<String> actualValues = filterDirector.requestHeaderManager().headersToAdd().get(headerKey);
 
       assertTrue("FilterDirector must add header, \"" + headerKey + "\" with the value, \"" + expectedValue + "\" to the request.", actualValues != null ? actualValues.contains(expectedValue) : false);
    }
 
    public static void directorMustAddHeaderToResponse(FilterDirector filterDirector, String headerKey) {
-      assertTrue("FilterDirector must add header, \"" + headerKey + "\" to the response.", filterDirector.responseHeaderManager().headersToAdd().containsKey(headerKey.toLowerCase()));
+      assertTrue("FilterDirector must add header, \"" + headerKey + "\" to the response.", filterDirector.responseHeaderManager().headersToAdd().containsKey(headerKey));
    }
 
    public static void directorMustRemoveHeaderToResponse(FilterDirector filterDirector, String headerKey) {
-      assertTrue("FilterDirector must remove header, \"" + headerKey + "\" from the response.", filterDirector.responseHeaderManager().headersToRemove().contains(headerKey.toLowerCase()));
+      assertTrue("FilterDirector must remove header, \"" + headerKey + "\" from the response.", filterDirector.responseHeaderManager().headersToRemove().contains(headerKey));
    }
 
    public static void directorMustAddHeaderValueToResponse(FilterDirector filterDirector, String headerKey, String expectedValue) {
-      final Set<String> actualValues = filterDirector.responseHeaderManager().headersToAdd().get(headerKey.toLowerCase());
+      final Set<String> actualValues = filterDirector.responseHeaderManager().headersToAdd().get(headerKey);
 
       assertTrue("FilterDirector must add header, \"" + headerKey + "\" with the value, \"" + expectedValue + "\" to the response.", actualValues != null ? actualValues.contains(expectedValue) : false);
    }

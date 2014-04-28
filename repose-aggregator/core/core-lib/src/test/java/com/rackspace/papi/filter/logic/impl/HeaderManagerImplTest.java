@@ -51,7 +51,7 @@ public class HeaderManagerImplTest {
 
             headerManagerImpl.appendToHeader(mockRequest, PowerApiHeader.USER.toString(), "username;q=1");
 
-            Set<String> values = headerManagerImpl.headersToAdd().get(PowerApiHeader.USER.toString().toLowerCase());
+            Set<String> values = headerManagerImpl.headersToAdd().get(PowerApiHeader.USER.toString());
 
             assertEquals("Should append header value if header already present.", "127.0.0.0;q=.3,username;q=1", values.iterator().next());
         }
@@ -62,7 +62,7 @@ public class HeaderManagerImplTest {
 
             headerManagerImpl.appendToHeader(mockRequest, PowerApiHeader.USER.toString(), "username;q=1");
 
-            Set<String> values = headerManagerImpl.headersToAdd().get(PowerApiHeader.USER.toString().toLowerCase());
+            Set<String> values = headerManagerImpl.headersToAdd().get(PowerApiHeader.USER.toString());
 
             assertEquals("Should put header value if header not present.", "username;q=1", values.iterator().next());
         }
