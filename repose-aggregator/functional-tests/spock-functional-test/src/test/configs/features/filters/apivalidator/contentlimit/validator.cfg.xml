@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<validators xmlns='http://openrepose.org/repose/validator/v1.0'>
+    <validator
+            role="default"
+            default="true"
+            wadl="default.wadl"
+            check-well-formed="false"
+            check-xsd-grammar="true"
+            check-elements="true"
+            check-headers="true"/>
+</validators>
