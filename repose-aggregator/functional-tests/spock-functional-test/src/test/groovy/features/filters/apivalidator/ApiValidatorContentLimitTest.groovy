@@ -40,6 +40,7 @@ class ApiValidatorContentLimitTest extends ReposeValveTest{
 
         then: "Reponse with 413"
         mc.receivedResponse.code == "413"
+        mc.receivedResponse.message == "Request Entity Too Large"
         mc.handlings.size() == 0
 
 

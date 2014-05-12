@@ -4,7 +4,7 @@
     <validator
             role="default"
             default="true"
-            wadl="default.wadl"
+            wadl="test.wadl"
             check-well-formed="false"
             check-xsd-grammar="true"
             check-elements="true"
