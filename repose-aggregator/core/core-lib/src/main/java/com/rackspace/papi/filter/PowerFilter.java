@@ -193,7 +193,6 @@ public class PowerFilter extends ApplicationContextAwareFilter {
                 LOG.error("Unable to initialize filter chain builder", ex);
             }
         }
-        LOG.info("Repose ready");
     }
 
     protected SystemModel getCurrentSystemModel() {
@@ -225,6 +224,8 @@ public class PowerFilter extends ApplicationContextAwareFilter {
         if (papiContext.metricsService() != null) {
             mbcResponseCodes = papiContext.metricsService().newMeterByCategory(ResponseCode.class, "Repose", "Response Code", TimeUnit.SECONDS);
         }
+
+        LOG.info("Repose ready");
     }
 
     @Override
