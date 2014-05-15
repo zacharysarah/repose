@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:atom="http://www.w3.org/2005/Atom">
+    <resources base="http://localhost:${targetPort}/">
+        <resource id="perftest1_events" path="perftest1/events">
+		<method id="addPlainEntry" name="POST">
+			<request>
+				<representation mediaType="application/atom+xml" element="atom:entry">
+				</representation>
+			</request>
+			<!-- Okay -->
+			<response status="201">
+				<representation mediaType="application/atom+xml"/>
+			</response>
+			<!-- On Error -->
+			<response status="400 401 409 413 500 503">
+				<representation mediaType="application/xml"/>
+			</response>
+		</method>
+	</resource>
+    </resources>
+</application>
