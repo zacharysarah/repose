@@ -71,4 +71,11 @@
         </pluginManagement>
     </build>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>openrepose-snapshots</id>
+            <url>http://protorepo.openrepose.org/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

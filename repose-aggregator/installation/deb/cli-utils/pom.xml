@@ -43,6 +43,7 @@
                             <execution>
 
                                 <configuration>
+                                    <classifier>all</classifier>
                                     <deb>[[buildDir]]/repose-[[artifactId]]-[[version]].deb</deb>
                                     <timestamped>true</timestamped>
 

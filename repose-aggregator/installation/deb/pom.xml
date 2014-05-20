@@ -33,7 +33,7 @@
                 <plugin>
                     <groupId>org.vafer</groupId>
                     <artifactId>jdeb</artifactId>
-                    <version>0.9</version>
+                    <version>1.1.1</version>
 
                     <executions>
                         <execution>
@@ -47,5 +47,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>

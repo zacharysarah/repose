@@ -42,6 +42,7 @@
                             <execution>
 
                                 <configuration>
+                                    <classifier>all</classifier>
                                     <deb>[[buildDir]]/[[artifactId]]-[[version]].deb</deb>
                                     <timestamped>true</timestamped>
                                     <dataSet>
