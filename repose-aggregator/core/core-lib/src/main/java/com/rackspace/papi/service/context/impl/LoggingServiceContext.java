@@ -71,6 +71,8 @@ public class LoggingServiceContext implements ServiceContext<LoggingService> {
                final String newLoggingConfig = loggingConfig.getHref();
                loggingConfigurationConfig = newLoggingConfig;
                updateLogConfigFileSubscription(loggingConfigurationConfig, newLoggingConfig);
+            } else {
+                //todo: Repose should break. The log buffer will splode if nothing can be written.
             }
          }
          isInitialized = true;
