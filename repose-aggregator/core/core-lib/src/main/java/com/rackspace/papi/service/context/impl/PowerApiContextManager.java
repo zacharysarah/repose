@@ -23,6 +23,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.UnavailableException;
 import java.util.Map;
 
 public class PowerApiContextManager implements ServletContextListener {
@@ -130,6 +131,18 @@ public class PowerApiContextManager implements ServletContextListener {
 
       final String insecureProp = InitParameter.INSECURE.getParameterName();
       final String insecure = System.getProperty(insecureProp, servletContext.getInitParameter(insecureProp));
+
+       if (System.getProperty(InitParameter.REPOSE_CLUSTER_ID.getParameterName()) == null) {
+           LOG.error("'repose-cluster-id' not provided -- Repose could not start. If running Repose in a container, " +
+                   "please restart Repose with the '-Drepose-cluster-id=YOUR_CLUSTER' flag present OR modify the " +
+                   "domain.xml/context.xml file for Glassfish/Tomcat respectively.");
+           return;
+       } else if (System.getProperty(InitParameter.REPOSE_NODE_ID.getParameterName()) == null) {
+           LOG.error("'repose-node-id' not provided -- Repose could not start. If running Repose in a container, " +
+                   "please restart Repose with the '-Drepose-node-id=YOUR_CLUSTER' flag present OR modify the " +
+                   "domain.xml/context.xml file for Glassfish/Tomcat respectively.");
+           return;
+       }
 
       if (StringUtilities.nullSafeEqualsIgnoreCase(insecure, "true")) {
          new HttpsURLConnectionSslInitializer().allowAllServerCerts();

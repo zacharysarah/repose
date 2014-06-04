@@ -41,16 +41,8 @@ public final class EmptyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         if (System.getProperty(InitParameter.REPOSE_CLUSTER_ID.getParameterName()) == null) {
-            LOG.error("'repose-cluster-id' not provided -- Repose could not start. If running Repose in a container, " +
-                    "please restart Repose with the '-Drepose-cluster-id=YOUR_CLUSTER' flag present OR modify the " +
-                    "domain.xml/context.xml file for Glassfish/Tomcat respectively.");
-
             throw new UnavailableException("EmptyServlet.init() : repose-cluster-id not provided");
         } else if (System.getProperty(InitParameter.REPOSE_NODE_ID.getParameterName()) == null) {
-            LOG.error("'repose-node-id' not provided -- Repose could not start. If running Repose in a container, " +
-                    "please restart Repose with the '-Drepose-node-id=YOUR_CLUSTER' flag present OR modify the " +
-                    "domain.xml/context.xml file for Glassfish/Tomcat respectively.");
-
             throw new UnavailableException("EmptyServlet.init() : repose-node-id not provided");
         }
     }
