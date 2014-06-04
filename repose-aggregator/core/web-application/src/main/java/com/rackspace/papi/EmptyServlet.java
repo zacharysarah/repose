@@ -2,12 +2,10 @@ package com.rackspace.papi;
 
 import com.rackspace.papi.commons.util.http.HttpStatusCode;
 import com.rackspace.papi.service.context.impl.PowerApiContextManager;
-import com.rackspace.papi.servlet.InitParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,15 +34,6 @@ public final class EmptyServlet extends HttpServlet {
         initialized = true;
 
         return initialized;
-    }
-
-    @Override
-    public void init() throws ServletException {
-        if (System.getProperty(InitParameter.REPOSE_CLUSTER_ID.getParameterName()) == null) {
-            throw new UnavailableException("EmptyServlet.init() : repose-cluster-id not provided");
-        } else if (System.getProperty(InitParameter.REPOSE_NODE_ID.getParameterName()) == null) {
-            throw new UnavailableException("EmptyServlet.init() : repose-node-id not provided");
-        }
     }
 
     @Override

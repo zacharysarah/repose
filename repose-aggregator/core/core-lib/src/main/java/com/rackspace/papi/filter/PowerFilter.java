@@ -15,6 +15,7 @@ import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.SystemModel;
 import com.rackspace.papi.service.context.ContextAdapter;
 import com.rackspace.papi.service.context.ServletContextHelper;
+import com.rackspace.papi.service.context.impl.PowerApiContextManager;
 import com.rackspace.papi.service.deploy.ApplicationDeploymentEvent;
 import com.rackspace.papi.service.event.PowerFilterEvent;
 import com.rackspace.papi.service.event.common.Event;
@@ -28,11 +29,7 @@ import com.rackspace.papi.service.reporting.metrics.MeterByCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,6 +49,7 @@ public class PowerFilter extends ApplicationContextAwareFilter {
     public static final String SYSTEM_MODEL_CONFIG_HEALTH_REPORT = "SystemModelConfigError";
     public static final String APPLICATION_DEPLOYMENT_HEALTH_REPORT = "ApplicationDeploymentError";
 
+    private boolean initialized = false;
     private final Object internalLock = new Object();
     private final EventListener<ApplicationDeploymentEvent, List<String>> applicationDeploymentListener;
     private final UpdateListener<SystemModel> systemModelConfigurationListener;
@@ -208,6 +206,11 @@ public class PowerFilter extends ApplicationContextAwareFilter {
         ports = servletContextHelper.getServerPorts();
         papiContext = servletContextHelper.getPowerApiContext();
 
+        if (servletContextHelper.getReposeInstanceInfo().getClusterId() == null ||
+                servletContextHelper.getReposeInstanceInfo().getNodeId() == null) {
+            return; // Don't initialize if clusterID or nodeID were not set
+        }
+
         papiContext.eventService().listen(applicationDeploymentListener, ApplicationDeploymentEvent.APPLICATION_COLLECTION_MODIFIED);
         URL xsdURL = getClass().getResource("/META-INF/schema/system-model/system-model.xsd");
         papiContext.configurationService().subscribeTo("", "system-model.cfg.xml", xsdURL, systemModelConfigurationListener, SystemModel.class);
@@ -258,6 +261,10 @@ public class PowerFilter extends ApplicationContextAwareFilter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (!isPowerApiContextManagerIntiliazed(request.getServletContext())) {
+            return; // Do nothing if the api context did not initialize properly
+        }
+
         final long startTime = System.currentTimeMillis();
         HttpServletHelper.verifyRequestAndResponse(LOG, request, response);
         long streamLimit = papiContext.containerConfigurationService().getContentBodyReadLimit();
@@ -318,5 +325,21 @@ public class PowerFilter extends ApplicationContextAwareFilter {
 
             log.error((logPrefix != null ? logPrefix + ":  " : "") + "Encountered invalid response code: " + responseCode);
         }
+    }
+
+    private boolean isPowerApiContextManagerIntiliazed(ServletContext sce) {
+        if (initialized) {
+            return true;
+        }
+
+        PowerApiContextManager manager = (PowerApiContextManager) sce.getAttribute("powerApiContextManager");
+
+        if (manager == null || !manager.isContextInitialized()) {
+            return false;
+        }
+
+        initialized = true;
+
+        return initialized;
     }
 }
