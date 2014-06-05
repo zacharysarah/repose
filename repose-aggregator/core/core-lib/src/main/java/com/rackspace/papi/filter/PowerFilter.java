@@ -208,6 +208,7 @@ public class PowerFilter extends ApplicationContextAwareFilter {
 
         if (servletContextHelper.getReposeInstanceInfo().getClusterId() == null ||
                 servletContextHelper.getReposeInstanceInfo().getNodeId() == null) {
+            LOG.warn("Cluster ID or Node ID not provided; power filter not initialized.");
             return; // Don't initialize if clusterID or nodeID were not set
         }
 
@@ -262,6 +263,7 @@ public class PowerFilter extends ApplicationContextAwareFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (!isPowerApiContextManagerIntiliazed(request.getServletContext())) {
+            LOG.warn("Cluster ID or Node ID not provided; filters will not be applied.");
             return; // Do nothing if the api context did not initialize properly
         }
 
