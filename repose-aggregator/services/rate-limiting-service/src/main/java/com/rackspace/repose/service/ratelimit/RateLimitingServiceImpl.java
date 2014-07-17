@@ -64,10 +64,10 @@ public class RateLimitingServiceImpl implements RateLimitingService {
 
         final ConfiguredLimitGroup configuredLimitGroup = helper.getConfiguredGroupByRole(groups);
         final List< Pair<String, ConfiguredRatelimit> > matchingConfiguredLimits = new ArrayList< Pair<String, ConfiguredRatelimit> >();
+        final List< Pair<String, ConfiguredRatelimit> > matchingGlobalConfiguredLimits = new ArrayList<>(); // TODO: this
         TimeUnit largestUnit = null;
 
         // Go through all of the configured limits for this group
-        // TODO: This collection should /always/ include the global limit group
         for (ConfiguredRatelimit rateLimit : configuredLimitGroup.getLimit()) {
             Matcher uriMatcher;
             if (rateLimit instanceof ConfiguredRateLimitWrapper) {
@@ -79,7 +79,6 @@ public class RateLimitingServiceImpl implements RateLimitingService {
             }
 
             // Did we find a limit that matches the incoming uri and http method?
-            // TODO: This conditional should always match if a rate limit is a global rate limit
             if (uriMatcher.matches() && httpMethodMatches(rateLimit.getHttpMethods(), httpMethod) && queryParameterNameMatches(rateLimit.getQueryParamNames(), parameterMap)) {
                 matchingConfiguredLimits.add(Pair.of(LimitKey.getLimitKey(configuredLimitGroup.getId(),
                         rateLimit.getId(), uriMatcher, useCaptureGroups), rateLimit));
@@ -89,8 +88,14 @@ public class RateLimitingServiceImpl implements RateLimitingService {
                 }
             }
         }
+        for (ConfiguredGlobalRateLimit globalLimit : configuredGlobalLimitGroup.getLimit()) {
+            // TODO: Same as in the above loop, except...
+        }
         if (matchingConfiguredLimits.size() > 0) {
             rateLimiter.handleRateLimit(user, matchingConfiguredLimits, largestUnit, datastoreWarnLimit);
+        }
+        if (matchingGlobalConfiguredLimits.size() > 0) {
+            // TODO: handle global rate limits in a method call like above, but with the user set to "YOLO" and the global limits collection
         }
     }
 
