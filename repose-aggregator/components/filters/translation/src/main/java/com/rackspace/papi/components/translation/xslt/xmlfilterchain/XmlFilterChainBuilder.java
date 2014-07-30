@@ -74,7 +74,6 @@ public class XmlFilterChainBuilder {
     } catch (TransformerConfigurationException ex) {
       LOG.error("Error", ex);
     }
-    addUriResolvers();
   }
 
 
@@ -91,17 +90,6 @@ public class XmlFilterChainBuilder {
               XALANC_TRANSFORMER_FACTORY : factory;
   }
   //
-
-  private void addUriResolvers() {
-    URIResolver resolver = factory.getURIResolver();
-    if (!(resolver instanceof SourceUriResolver)) {
-      SourceUriResolverChain chain = new SourceUriResolverChain(resolver);
-      chain.addResolver(new InputStreamUriParameterResolver());
-      chain.addResolver(new ClassPathUriResolver());
-      chain.addResolver(new HttpxUriInputParameterResolver());
-      factory.setURIResolver(chain);
-    }
-  }
 
   public XmlFilterChain build(StyleSheetInfo... stylesheets) throws XsltException {
     try {
