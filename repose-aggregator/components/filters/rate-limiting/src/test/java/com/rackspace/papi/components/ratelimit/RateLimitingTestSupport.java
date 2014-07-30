@@ -36,6 +36,7 @@ public abstract class RateLimitingTestSupport {
    }
 
    public static ConfiguredLimitGroup newConfiguredLimitGroup(String userRole, String rateLimitUri, String uriRegex, String limitGroupId) {
+
       final int VALUE = 3;
       final ConfiguredLimitGroup limitGroup = new ConfiguredLimitGroup();
       limitGroup.setDefault(Boolean.TRUE);

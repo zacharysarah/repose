@@ -5,7 +5,11 @@ import com.rackspace.repose.service.limits.schema.RateLimitList;
 import com.rackspace.repose.service.limits.schema.TimeUnit;
 import com.rackspace.repose.service.ratelimit.cache.CachedRateLimit;
 import com.rackspace.repose.service.ratelimit.cache.RateLimitCache;
-import com.rackspace.repose.service.ratelimit.config.*;
+import com.rackspace.repose.service.ratelimit.config.ConfiguredLimitGroup;
+import com.rackspace.repose.service.ratelimit.config.ConfiguredRateLimitWrapper;
+import com.rackspace.repose.service.ratelimit.config.ConfiguredRatelimit;
+import com.rackspace.repose.service.ratelimit.config.RateLimitingConfigHelper;
+import com.rackspace.repose.service.ratelimit.config.RateLimitingConfiguration;
 import com.rackspace.repose.service.ratelimit.exception.OverLimitException;
 import com.rackspace.repose.service.ratelimit.util.StringUtilities;
 import org.apache.commons.lang3.tuple.Pair;
@@ -56,15 +60,16 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     }
 
     @Override
-    public void trackLimits(String user, List<String> groups, String uri, Map<String, String[]> parameterMap, String httpMethod, int datastoreWarnLimit) throws OverLimitException {
+    public void trackLimits(String user, List<String> groups, String uri, Map<String, String[]> parameterMap,
+                            String httpMethod, int datastoreWarnLimit) throws OverLimitException {
 
         if (StringUtilities.isBlank(user)) {
             throw new IllegalArgumentException("User required when tracking rate limits.");
         }
 
         final ConfiguredLimitGroup configuredLimitGroup = helper.getConfiguredGroupByRole(groups);
-        final List< Pair<String, ConfiguredRatelimit> > matchingConfiguredLimits = new ArrayList< Pair<String, ConfiguredRatelimit> >();
-        final List< Pair<String, ConfiguredRatelimit> > matchingGlobalConfiguredLimits = new ArrayList<>(); // TODO: this
+        final List<Pair<String, ConfiguredRatelimit>> matchingConfiguredLimits = new ArrayList<>();
+        final List<Pair<String, ConfiguredRatelimit>> matchingGlobalConfiguredLimits = new ArrayList<>(); // TODO: this
         TimeUnit largestUnit = null;
 
         // Go through all of the configured limits for this group
@@ -88,14 +93,36 @@ public class RateLimitingServiceImpl implements RateLimitingService {
                 }
             }
         }
-        for (ConfiguredGlobalRateLimit globalLimit : configuredGlobalLimitGroup.getLimit()) {
+
+        for (ConfiguredRatelimit globalLimit : configuredGlobalLimitGroup.getLimit()) {
             // TODO: Same as in the above loop, except...
+            Matcher uriMatcher;
+            if (globalLimit instanceof ConfiguredGlobalRateLimitWrapper) {
+                uriMatcher = ((ConfiguredRateLimitWrapper) globalLimit).getRegexPattern().matcher(uri);
+            } else {
+                LOG.error("Unable to locate pre-built regular expression pattern in for limit group.  This state is not valid. "
+                          + "In order to continue operation, rate limiting will compile patterns dynamically.");
+                uriMatcher = Pattern.compile(globalLimit.getUriRegex()).matcher(uri);
+            }
+
+            // Did we find a limit that matches the incoming uri and http method?
+            if (uriMatcher.matches() && httpMethodMatches(globalLimit.getHttpMethods(), httpMethod) && queryParameterNameMatches(globalLimit.getQueryParamNames(), parameterMap)) {
+                matchingConfiguredLimits.add(Pair.of(LimitKey.getLimitKey(configuredLimitGroup.getId(),
+                                                                          globalLimit.getId(), uriMatcher, useCaptureGroups), globalLimit));
+
+                if (largestUnit == null || globalLimit.getUnit().compareTo(largestUnit) > 0) {
+                    largestUnit = globalLimit.getUnit();
+                }
+            }
         }
+
         if (matchingConfiguredLimits.size() > 0) {
             rateLimiter.handleRateLimit(user, matchingConfiguredLimits, largestUnit, datastoreWarnLimit);
         }
+
         if (matchingGlobalConfiguredLimits.size() > 0) {
             // TODO: handle global rate limits in a method call like above, but with the user set to "YOLO" and the global limits collection
+            rateLimiter.handleRateLimit(user, matchingGlobalConfiguredLimits, largestUnit, datastoreWarnLimit);
         }
     }
 

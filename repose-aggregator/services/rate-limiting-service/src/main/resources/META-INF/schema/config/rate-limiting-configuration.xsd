@@ -184,7 +184,8 @@
         <xs:annotation>
             <xs:documentation>
                 <html:p>
-                    Defines a list of rate limits to apply globally (i.e., to every request without exception).
+                    Defines a list of rate limits to apply globally without regard to user or limit group.
+                    Method and uri regex still apply.
                 </html:p>
             </xs:documentation>
         </xs:annotation>
@@ -335,7 +336,4 @@
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
-    
-    
-    
 </xs:schema>

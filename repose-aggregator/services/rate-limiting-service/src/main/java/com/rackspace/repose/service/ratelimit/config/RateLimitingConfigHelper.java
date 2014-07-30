@@ -40,10 +40,19 @@ public class RateLimitingConfigHelper {
 
     private List<ConfiguredLimitGroup> processConfiguration(RateLimitingConfiguration configurationObject) {
         boolean defaultSet = false;
-        final List<ConfiguredLimitGroup> newLimitGroups = new ArrayList<ConfiguredLimitGroup>();
+        final List<ConfiguredLimitGroup> newLimitGroups = new ArrayList<>();
 
         for (ConfiguredGlobalLimitGroup globalLimitGroup: configurationObject.getGlobalLimitGroup()) {
             // TODO: Do stuff here to add to the newLimitGroups list (like below)
+            final ConfiguredGlobalLimitGroup newGlobalLimitGroup = deepCopyLimitGroup(globalLimitGroup);
+            newLimitGroup.getLimit().clear();
+
+            for (ConfiguredRatelimit configuredRatelimit : limitGroup.getLimit()) {
+                final ConfiguredRatelimit newLimit = new ConfiguredRateLimitWrapper(configuredRatelimit);
+                newLimitGroup.getLimit().add(newLimit);
+            }
+
+            newLimitGroups.add(newLimitGroup);
         }
 
         for (ConfiguredLimitGroup limitGroup : configurationObject.getLimitGroup()) {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rate-limiting xmlns="http://docs.rackspacecloud.com/repose/rate-limiting/v1.0"
+               use-capture-groups="true">
+
+    <request-endpoint uri-regex="/service/limits" include-absolute-limits="false"/>
+
+    <limit-group id="test1" groups="dbaas" default="false">
+        <limit id="test1" uri="all" uri-regex="/*" http-methods="ALL" unit="MINUTE" value="3"/>
+    </limit-group>
+
+
+</rate-limiting>
