@@ -58,7 +58,7 @@ public class OpenStackResponseHandler {
         // If in the case that the origin service supports delegated authentication
         // we should then communicate to the client how to authenticate with us
         if (!StringUtilities.isBlank(wwwAuthenticateHeader) && wwwAuthenticateHeader.contains(DELEGATED)) {
-            director.responseHeaderManager().putHeader(CommonHttpHeader.WWW_AUTHENTICATE.toString(), wwwAuthenticate);
+            director.responseHeaderManager().appendHeader(CommonHttpHeader.WWW_AUTHENTICATE.toString(), wwwAuthenticate);
         } else {
             // In the case where authentication has failed and we did not receive
             // a delegated WWW-Authenticate header, this means that our own authentication
