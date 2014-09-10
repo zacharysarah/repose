@@ -7,7 +7,7 @@ import javax.ws.rs.core.{HttpHeaders, MediaType}
 
 import com.rackspace.papi.commons.util.http._
 import com.rackspace.papi.commons.util.servlet.http.ReadableHttpServletResponse
-import com.rackspace.papi.components.keystone.v3.config.KeystoneV3Config
+import com.rackspace.papi.components.keystone.v3.config.{WhiteList, KeystoneV3Config}
 import com.rackspace.papi.components.keystone.v3.json.spray.IdentityJsonProtocol._
 import com.rackspace.papi.components.keystone.v3.objects._
 import com.rackspace.papi.components.keystone.v3.utilities._
@@ -47,7 +47,7 @@ class KeystoneV3Handler(keystoneConfig: KeystoneV3Config, akkaServiceClient: Akk
   private[v3] var cachedAdminToken: Option[String] = None
 
   override def handleRequest(request: HttpServletRequest, response: ReadableHttpServletResponse): FilterDirector = {
-    if (isUriWhitelisted(request.getRequestURI, Option(keystoneConfig.getWhiteList).map(_.getUriPattern.asScala.toList).getOrElse(List.empty[String]))) {
+    if (isUriWhitelisted(request.getRequestURI, keystoneConfig.getWhiteList)) {
       LOG.debug("Request URI matches a configured whitelist pattern! Allowing request to pass through.")
       val filterDirector: FilterDirector = new FilterDirectorImpl()
       filterDirector.setFilterAction(FilterAction.PASS)
@@ -391,8 +391,10 @@ class KeystoneV3Handler(keystoneConfig: KeystoneV3Config, akkaServiceClient: Akk
   private def jsonStringToObject[T: JsonFormat](json: String) =
     json.parseJson.convertTo[T]
 
-  private val isUriWhitelisted = (requestUri: String, whiteList: List[String]) =>
-    whiteList.filter(requestUri.matches).nonEmpty
+  private val isUriWhitelisted = (requestUri: String, whiteList: WhiteList) => {
+    val convertedWhiteList = Option(whiteList).map(_.getUriPattern.asScala.toList).getOrElse(List.empty[String])
+    convertedWhiteList.filter(requestUri.matches).nonEmpty
+  }
 
   private val safeLongToInt = (l: Long) =>
     math.min(l, Int.MaxValue).toInt
