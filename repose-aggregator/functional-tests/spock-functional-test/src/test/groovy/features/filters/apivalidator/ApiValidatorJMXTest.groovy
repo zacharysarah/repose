@@ -87,6 +87,25 @@ class ApiValidatorJMXTest extends ReposeValveTest {
         }
     }
 
+    def "when the system model config changes, the number of registered validator MXBeans should not change"() {
+
+        when:
+        def validatorBeans = repose.jmx.getMBeans(validatorBeanDomain, validatorClassName, 2)
+
+        then:
+        // Confirm an initial validator bean count of 2 (based on preceding test)
+        validatorBeans.size() == 2
+
+        when:
+        // Make a change to the system model configuration and wait for Repose to update
+        repose.configurationProvider.applyConfigs("features/filters/apivalidator/systemModelUpdate", params, /*sleepTime*/ 20)
+        validatorBeans = repose.jmx.getMBeans(validatorBeanDomain, validatorClassName, 2)
+
+        then:
+        // Issue REP-24 results in the bean count doubling to 4
+        validatorBeans.size() == 2
+    }
+
     def "when request is for role-1, should increment invalid request for ApiValidator mbeans for role 1"() {
         given:
         def validator1Target = repose.jmx.getMBeanAttribute(API_VALIDATOR_1, "Count")
