@@ -4,12 +4,10 @@
         <Console name="STDOUT">
             <PatternLayout pattern="%-4r [%t] %-5p %c  - %m%n"/>
         </Console>
-        <List name="List0"/>
     </Appenders>
     <Loggers>
         <Root level="debug">
             <AppenderRef ref="STDOUT"/>
-            <AppenderRef ref="List0"/>
         </Root>
         <Logger name="com.sun.jersey" level="off"/>
         <Logger name="net.sf.ehcache" level="error"/>
