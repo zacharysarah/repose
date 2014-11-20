@@ -510,4 +510,30 @@ class MaskRaxRoles403Test extends ReposeValveTest{
         "GET"    | "/v"   | ["x-roles": "test_user12, a:admin"]             | "200"
         "GET"    | "/v"   | ["x-roles": "test_user12, a:foo"]               | "200"
     }
+    /*
+        When enable-rax-roles is true, mask-rax-roles-403 is true, and the wadl specifies a required header,
+        response code always be 404 or 405.
+     */
+    @Unroll("User13:method=#method,path=#path,headers=#headers,expected response=#responseCode")
+    def "when enable-rax-roles is true, mask-rax-roles-403 is true, and the wadl specifies a required header, response code always be 404 or 405"() {
+
+        when:
+        MessageChain messageChain = deproxy.makeRequest(url: reposeEndpoint + path, method: method, headers: headers)
+
+        then:
+        messageChain.getReceivedResponse().getCode().equals(responseCode)
+
+        where:
+        method   | path   | headers                                                     | responseCode
+        "GET"    | "/a"   | ["x-roles": "test_user13"]                                  | "404"
+        "PUT"    | "/a"   | ["x-roles": "test_user13"]                                  | "404"
+        "GET"    | "/a"   | ["x-roles": "test_user13", "x-auth-token": "test"]          | "200"
+        "PUT"    | "/a"   | ["x-roles": "test_user13", "x-auth-token": "test"]          | "404"
+        "GET"    | "/a"   | ["x-roles": "test_user13, a:admin"]                         | "404"
+        "PUT"    | "/a"   | ["x-roles": "test_user13, a:admin"]                         | "404"
+        "GET"    | "/a"   | ["x-roles": "test_user13, a:admin", "x-auth-token": "test"] | "200"
+        "PUT"    | "/a"   | ["x-roles": "test_user13, a:admin", "x-auth-token": "test"] | "200"
+        "POST"   | "/a"   | ["x-roles": "test_user13"]                                  | "405"
+        "GET"    | "/b"   | ["x-roles": "test_user13"]                                  | "404"
+    }
 }

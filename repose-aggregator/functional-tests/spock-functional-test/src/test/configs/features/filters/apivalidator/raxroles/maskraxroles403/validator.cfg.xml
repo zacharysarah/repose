@@ -208,4 +208,16 @@
         </application>
     </validator>
 
+    <validator role="test_user13" default="false" enable-rax-roles="true" mask-rax-roles-403="true">
+        <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+            <resources base="http://localhost:${targetPort}">
+                <resource path="/a">
+                    <param name="x-auth-token" style="header" type="xs:string" required="true"/>
+                    <method name="GET"/>
+                    <method name="PUT" rax:roles="a:admin"/>
+                </resource>
+            </resources>
+        </application>
+    </validator>
+
 </validators>
