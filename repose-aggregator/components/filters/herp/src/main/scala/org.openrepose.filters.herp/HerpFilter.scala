@@ -101,9 +101,9 @@ class HerpFilter extends Filter with HttpDelegationManager with UpdateListener[H
     )
 
     val templateOutput: StringWriter = new StringWriter
-    handlebarsTemplate.apply(templateValues.asJava, templateOutput)
+//    handlebarsTemplate.apply(templateValues.asJava, templateOutput)
 
-    herpLogger.info(templateOutput.toString)
+    herpLogger.info("{\n\"GUID\":\"{{guid}}\",\n\"ServiceCode\":\"{{serviceCode}}\",\n\"Region\":\"{{region}}\",\n\"DataCenter\":\"{{dataCenter}}\",\n\"Timestamp\":\"{{timestamp}}\",\n\"Request\":{\n\"Method\":\"{{requestMethod}}\",\n\"URL\":\"{{requestURL}}\",\n\"QueryString\":\"{{requestQueryString}}\",\n\"Parameters\":{{{#eachparameters}}\n{{#if@index}},{{/if}}\"{{key}}\":[{{#eachvalue}}{{#if@index}},{{/if}}\"{{.}}\"{{/each}}]\n{{/each}}},\n\"UserName\":\"{{userName}}\",\n\"ImpersonatorName\":\"{{impersonatorName}}\",\n\"ProjectID\":[{{#eachprojectID}}\n{{#if@index}},{{/if}}\"{{.}}\"\n{{/each}}],\n\"Roles\":[{{#eachroles}}\n{{#if@index}},{{/if}}\"{{.}}\"\n{{/each}}],\n\"UserAgent\":\"{{userAgent}}\"\n},\n\"Response\":{\n\"Code\":{{responseCode}},\n\"Message\":\"{{responseMessage}}\"\n}\n}")
   }
 
   override def destroy(): Unit = {
