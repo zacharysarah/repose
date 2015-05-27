@@ -44,8 +44,8 @@ class MultiTenantHeadersTest extends ReposeValveTest {
 
         def params = properties.defaultTemplateParams
         repose.configurationProvider.applyConfigs("common", params)
-        repose.configurationProvider.applyConfigs("features/filters/clientauthn/common", params)
-        repose.configurationProvider.applyConfigs("features/filters/clientauthn/multitenantheader", params)
+        repose.configurationProvider.applyConfigs("features/filters/keystonev2/common", params)
+        repose.configurationProvider.applyConfigs("features/filters/keystonev2/multitenantheader", params)
         repose.start()
 
         originEndpoint = deproxy.addEndpoint(properties.targetPort, 'origin service')
