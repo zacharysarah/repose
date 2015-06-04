@@ -44,24 +44,18 @@ class HttpServletRequestWrapper(originalRequest: HttpServletRequest)
     override def compare(x: String, y: String): Int = x compareToIgnoreCase y
   }
 
-  def getHeaderNamesScala: Set[String] = {
+  def getHeaderNamesScala: Set[String] =
     super.getHeaderNames.asScala.toSet.filterNot(removedHeaders.contains) ++ headerMap.keySet
-  }
 
   override def getHeaderNames: util.Enumeration[String] = getHeaderNamesScala.toIterator.asJavaEnumeration
 
   override def getHeaderNamesList: util.List[String] = getHeaderNamesScala.toList.asJava
 
-  override def getIntHeader(headerName: String): Int = Option(getHeader(headerName)).getOrElse("-1").toInt
+  override def getIntHeader(headerName: String): Int = Option(getHeader(headerName)).map(_.toInt).getOrElse(-1)
 
-  def getHeadersScala(headerName: String): List[String] = {
-    if (removedHeaders.contains(headerName)) {
-      List[String]()
-    }
-    else {
-      headerMap.getOrElse(headerName, super.getHeaders(headerName).asScala.toList)
-    }
-  }
+  def getHeadersScala(headerName: String): List[String] =
+    if (removedHeaders.contains(headerName)) Nil
+    else headerMap.getOrElse(headerName, super.getHeaders(headerName).asScala.toList)
 
   override def getHeaders(headerName: String): util.Enumeration[String] = getHeadersScala(headerName).toIterator.asJavaEnumeration
 
@@ -81,15 +75,17 @@ class HttpServletRequestWrapper(originalRequest: HttpServletRequest)
   override def getHeadersList(headerName: String): util.List[String] = getHeadersScala(headerName).asJava
 
   override def addHeader(headerName: String, headerValue: String): Unit = {
-    val existingHeaders: List[String] = getHeadersScala(headerName) //this has to be done before we remove from the list,
-                                                                    // because getting this list is partially based on the contents of the removed list
+    // Getting the current values of this header must be done before we remove from the removedHeaders collection
+    // because the current header values are partially determined by the contents of the removedHeaders collection.
+    val existingHeaders: List[String] = getHeadersScala(headerName)
     if (removedHeaders.contains(headerName)) {
       removedHeaders = removedHeaders.filterNot(_.equalsIgnoreCase(headerName))
     }
     headerMap = headerMap + (headerName -> (existingHeaders :+ headerValue))
   }
 
-  override def addHeader(headerName: String, headerValue: String, quality: Double): Unit = addHeader(headerName, headerValue + ";q=" + quality)
+  override def addHeader(headerName: String, headerValue: String, quality: Double): Unit =
+    addHeader(headerName, headerValue + ";q=" + quality)
 
   override def appendHeader(headerName: String, headerValue: String): Unit = {
     val existingHeaders: List[String] = getHeadersScala(headerName)
@@ -101,7 +97,8 @@ class HttpServletRequestWrapper(originalRequest: HttpServletRequest)
     }
   }
 
-  override def appendHeader(headerName: String, headerValue: String, quality: Double): Unit = appendHeader(headerName, headerValue + ";q=" + quality)
+  override def appendHeader(headerName: String, headerValue: String, quality: Double): Unit =
+    appendHeader(headerName, headerValue + ";q=" + quality)
 
   override def removeHeader(headerName: String): Unit = {
     removedHeaders = removedHeaders + headerName
