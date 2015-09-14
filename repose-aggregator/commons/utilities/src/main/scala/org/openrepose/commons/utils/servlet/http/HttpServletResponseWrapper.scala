@@ -19,7 +19,7 @@
  */
 package org.openrepose.commons.utils.servlet.http
 
-import java.io.InputStream
+import java.io.{InputStream, PrintWriter}
 import java.util
 import java.util.Date
 import javax.servlet.ServletOutputStream
@@ -74,6 +74,12 @@ import scala.util.Try
 class HttpServletResponseWrapper(originalResponse: HttpServletResponse, headerMode: ResponseMode, bodyMode: ResponseMode, desiredOutputStream: ServletOutputStream)
   extends javax.servlet.http.HttpServletResponseWrapper(originalResponse)
   with HeaderInteractor {
+
+  private val bodyOutputStream = bodyMode match {
+    case ResponseMode.PASSTHROUGH => new PassthroughServletOutputStream(desiredOutputStream)
+    case ResponseMode.READONLY => new ReadOnlyServletOutputStream(desiredOutputStream)
+    case ResponseMode.MUTABLE => new MutableServletOutputStream(desiredOutputStream)
+  }
 
   private val caseInsensitiveOrdering = Ordering.by[String, String](_.toLowerCase)
 
@@ -199,12 +205,22 @@ class HttpServletResponseWrapper(originalResponse: HttpServletResponse, headerMo
   /**
    * @throws IllegalStateException when bodyMode is ResponseMode.PASSTHROUGH
    */
-  def getOutputStreamAsInputStream: InputStream = ???
+  def getOutputStreamAsInputStream: InputStream = bodyOutputStream.getOutputStreamAsInputStream
 
   /**
    * @throws IllegalStateException when bodyMode is anything other than ResponseMode.MUTABLE
    */
-  def setOutput(inputStream: InputStream): Unit = ???
+  def setOutput(inputStream: InputStream): Unit = bodyOutputStream.setOutput(inputStream)
+
+  override def sendError(i: Int, s: String): Unit = ???
+
+  override def sendError(i: Int): Unit = ???
+
+  override def getWriter: PrintWriter = ???
+
+  override def getOutputStream: ServletOutputStream = bodyOutputStream
+
+  override def flushBuffer(): Unit = ???
 
   /**
    * @throws IllegalStateException when neither headerMode nor bodyMode is ResponseMode.MUTABLE
@@ -222,11 +238,7 @@ class HttpServletResponseWrapper(originalResponse: HttpServletResponse, headerMo
     )
 
     //Write the body, if the body mode is set to mutable
-    val writeBody = Try(
-      ifMutable(bodyMode) {
-        //TODO: Commit the response body
-      }
-    )
+    val writeBody = Try(bodyOutputStream.commit)
 
     //Throw a failure exception (both should be identical) if neither the header nor body mode is set to mutable
     if (writeHeaders.isFailure && writeBody.isFailure) writeHeaders.get
