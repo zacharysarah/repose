@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<translation xmlns="http://docs.openrepose.org/repose/translation/v1.0" allow-doctype-decl="true">
+    <request-translations>
+        <request-translation>
+            <style-sheets headers="true">
+                <style id="copy">
+                    <xsl>
+                        <xsl:stylesheet version="1.0" xmlns:httpx="http://docs.openrepose.org/repose/httpx/v1.0"
+                                        xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+                            <xsl:output method="xml"/>
+                            <xsl:param name="input-headers-uri"/>
+                            <xsl:param name="output-headers-uri"/>
+                            <xsl:variable name="headersDoc" select="doc($input-headers-uri)"/>
+                            <xsl:template match="/">
+                                <xsl:copy-of select="."/>
+                                <xsl:apply-templates select="$headersDoc/*"/>
+                            </xsl:template>
+                            <xsl:template match="httpx:headers">
+                                <xsl:result-document method="xml" href="repose:output:headers.xml"
+                                                     include-content-type="no">
+                                    <httpx:headers>
+                                        <httpx:request>
+                                            <xsl:apply-templates/>
+                                        </httpx:request>
+                                    </httpx:headers>
+                                </xsl:result-document>
+                            </xsl:template>
+                            <xsl:template match="httpx:request">
+                                <xsl:variable name="userIp"
+                                              select="substring-before(./httpx:header[upper-case(@name) = 'X-PP-USER']/@value, ';q=')"/>
+
+                                <xsl:for-each select="./httpx:header">
+                                    <xsl:choose>
+                                        <xsl:when test=".[upper-case(@name) = 'X-PP-GROUPS']">
+                                            <xsl:choose>
+                                                <xsl:when
+                                                        test="($userIp = '127.0.0.1') or ($userIp = '4.3.2.1')">
+                                                    <xsl:element name="httpx:header">
+                                                        <xsl:attribute name="name">
+                                                            <xsl:value-of select="@name"/>
+                                                        </xsl:attribute>
+                                                        <xsl:attribute name="value">
+                                                            <xsl:value-of select="'ip_super_duper'"/>
+                                                        </xsl:attribute>
+                                                        <xsl:attribute name="quality">
+                                                            <xsl:value-of select="substring-after(@value, ';q=')"/>
+                                                        </xsl:attribute>
+                                                    </xsl:element>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:copy-of select="."/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:copy-of select="."/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:for-each>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </xsl>
+                </style>
+            </style-sheets>
+        </request-translation>
+    </request-translations>
+</translation>
