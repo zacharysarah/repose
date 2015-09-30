@@ -110,7 +110,7 @@
 
     <xs:complexType name="AuthenticationType">
         <xs:attribute name="fqcn" type="xs:string"
-                      default="org.openrepose.core.services.atomfeed.impl.NoopAuthenticatedRequestFactory">
+                      default="org.openrepose.nodeservice.atomfeed.impl.auth.NoopAuthenticatedRequestFactory">
             <xs:annotation>
                 <xs:documentation>
                     <html:p>Defines the fully qualified class name of a class which can authenticate requests.</html:p>
@@ -123,7 +123,7 @@
         <xs:complexContent>
             <xs:restriction base="AuthenticationType">
                 <xs:attribute name="fqcn" type="xs:string"
-                              fixed="org.openrepose.core.services.atomfeed.impl.OpenStackIdentityAuthenticatedRequestFactory"/>
+                              fixed="org.openrepose.nodeservice.atomfeed.impl.auth.OpenStackIdentityAuthenticatedRequestFactory"/>
             </xs:restriction>
         </xs:complexContent>
     </xs:complexType>
