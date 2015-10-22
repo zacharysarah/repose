@@ -57,6 +57,7 @@ class TestProperties {
     int identityPort
     int valkyriePort
     int atomPort
+    int atomPort2
     int phonehomePort
     String targetHostname
 
@@ -99,6 +100,7 @@ class TestProperties {
             identityPort = PortFinder.Singleton.getNextOpenPort()
             valkyriePort = PortFinder.Singleton.getNextOpenPort()
             atomPort = PortFinder.Singleton.getNextOpenPort()
+            atomPort2 = PortFinder.Singleton.getNextOpenPort()
             phonehomePort = PortFinder.Singleton.getNextOpenPort()
             targetHostname = properties.getProperty("target.hostname")
             rawConfigDirectory = properties.getProperty("repose.raw.config.directory")
@@ -127,6 +129,7 @@ class TestProperties {
                 targetPort2              : targetPort2,
                 identityPort             : identityPort,
                 atomPort                 : atomPort,
+                atomPort2                : atomPort2,
                 targetHostname           : targetHostname,
                 logFile                  : logFile,
                 logFileName              : logFile,
